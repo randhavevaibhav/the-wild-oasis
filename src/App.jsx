@@ -1,7 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import GlobalStyles from "./styles/GlobalStyles";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
+import GlobalStyles from "./styles/GlobalStyles";
 import Dashboard from "./pages/Dashboard";
 import Bookings from "./pages/Bookings";
 import Cabins from "./pages/Cabins";
@@ -12,9 +14,17 @@ import Login from "./pages/Login";
 import PageNotFound from "./pages/PageNotFound";
 import AppLayout from "./ui/AppLayout";
 
+
+const queryClient = new QueryClient({
+  defaultOptions:{
+    staleTime:0, //keep the remote state data in the cache for the      specified time in ms before fetching new data.
+  },
+})
 const App = () => {
   return (
-    <>
+   
+    <QueryClientProvider client={queryClient}>
+      <ReactQueryDevtools initialIsOpen={false}/>
       <GlobalStyles />
       <BrowserRouter>
         <Routes>
@@ -35,7 +45,8 @@ const App = () => {
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </BrowserRouter>
-    </>
+      </QueryClientProvider>
+   
   );
 };
 
