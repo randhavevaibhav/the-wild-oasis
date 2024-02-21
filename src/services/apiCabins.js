@@ -42,7 +42,11 @@ const hasImagePath = newCabin.image?.startsWith?.(supabaseUrl)
     console.log(error);
     throw new Error("Cabin could not be created !!");
   }
+
   //2.upload img
+
+  //if img is already uploaded.
+  if(hasImagePath) return data;
   const { error: storageError } = await supabase.storage
     .from("cabin-images")
     .upload(imageName, newCabin.image);
