@@ -14,15 +14,18 @@ export const getCabins = async () => {
 export const CreateEditCabin = async (newCabin, id) => {
   //https://ipmcodordginsmosxniv.supabase.co/storage/v1/object/public/cabin-images/cabin-006.jpg
 
-const hasImagePath = newCabin.image?.startsWith?.(supabaseUrl)
+  const hasImagePath = newCabin.image?.startsWith?.(supabaseUrl);
 
   //creating a unique image file name
   const imageName = `${Math.random()}-${newCabin.image.name}`.replaceAll(
     "/",
     ""
   );
+  console.log("copy cabin name ====>" + newCabin.name);
 
-  const imagePath = hasImagePath?newCabin.image: `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
+  const imagePath = hasImagePath
+    ? newCabin.image
+    : `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
 
   let query = supabase.from("cabins");
   //A create
@@ -40,22 +43,23 @@ const hasImagePath = newCabin.image?.startsWith?.(supabaseUrl)
 
   if (error) {
     console.log(error);
-    //changed error message for created and edited
-    if(id)
-    {
-      throw new Error("Cabin could not be Edited !!");
+    let errorIn = "Created";
 
-    }else{
-      throw new Error("Cabin could not be created !!");
-
+    if (id) {
+      errorIn = "Edited";
+    } else if (newCabin.name.includes("Copy")) {
+      errorIn = "Duplicated";
+    } else {
+      errorIn = "Created";
     }
-  
+
+    throw new Error(`Cabin could not be ${errorIn} !!`);
   }
 
   //2.upload img
 
   //if img is already uploaded.
-  if(hasImagePath) return data;
+  if (hasImagePath) return data;
   const { error: storageError } = await supabase.storage
     .from("cabin-images")
     .upload(imageName, newCabin.image);
@@ -73,9 +77,9 @@ const hasImagePath = newCabin.image?.startsWith?.(supabaseUrl)
 export const deleteCabin = async (id) => {
   const { data, error } = await supabase.from("cabins").delete().eq("id", id);
 
-  console.log("data from delete cabin query ==> "+data)
-//show error if the return data is null
-  if (error ||data===null) {
+  console.log("data from delete cabin query ==> " + data);
+  //show error if the return data is null
+  if (error || data === null) {
     console.log(error);
     throw new Error("Cabins could not be deleted !!");
   }
