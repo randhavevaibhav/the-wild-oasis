@@ -40,7 +40,16 @@ const hasImagePath = newCabin.image?.startsWith?.(supabaseUrl)
 
   if (error) {
     console.log(error);
-    throw new Error("Cabin could not be created !!");
+    //changed error message for created and edited
+    if(id)
+    {
+      throw new Error("Cabin could not be Edited !!");
+
+    }else{
+      throw new Error("Cabin could not be created !!");
+
+    }
+  
   }
 
   //2.upload img
@@ -64,7 +73,9 @@ const hasImagePath = newCabin.image?.startsWith?.(supabaseUrl)
 export const deleteCabin = async (id) => {
   const { data, error } = await supabase.from("cabins").delete().eq("id", id);
 
-  if (error) {
+  console.log("data from delete cabin query ==> "+data)
+//show error if the return data is null
+  if (error ||data===null) {
     console.log(error);
     throw new Error("Cabins could not be deleted !!");
   }
