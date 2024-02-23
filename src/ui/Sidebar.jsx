@@ -18,7 +18,8 @@ const Sidebar = () => {
    <StyledSidebar>
     <Logo/>
     <MainNav/>
-    <Uploader/>
+    {/* use to upload dummy data */}
+    {/* <Uploader/> */}
 
    </StyledSidebar>
   )
