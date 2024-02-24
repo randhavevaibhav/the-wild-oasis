@@ -43,17 +43,14 @@ export const CreateEditCabin = async (newCabin, id) => {
 
   if (error) {
     console.log(error);
-    let errorIn = "Created";
+    let errorIn = "creating new";
 
-    if (id) {
-      errorIn = "Edited";
-    } else if (newCabin.name.includes("Copy")) {
-      errorIn = "Duplicated";
-    } else {
-      errorIn = "Created";
+    if(newCabin.name?.includes("Copy"))
+    {
+      errorIn="duplicating"
     }
 
-    throw new Error(`Cabin could not be ${errorIn} !!`);
+    throw new Error(`Error in ${errorIn} cabin`);
   }
 
   //2.upload img

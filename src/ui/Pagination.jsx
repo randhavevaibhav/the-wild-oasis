@@ -64,10 +64,10 @@ const Pagination = ({count}) => {
   const [searchParam,setSearchParam] = useSearchParams();
 
   const currentPage =!searchParam.get("page")?1:Number(searchParam.get("page"));
-  console.log("count ===> "+count)
+  //console.log("count ===> "+count)
  
   const pageCount = Math.ceil(count/PAGE_SIZE);
-  console.log("pageCount ===> "+pageCount)
+  //console.log("pageCount ===> "+pageCount)
 
   const nextPage = ()=>{
     const next = currentPage===pageCount?currentPage:currentPage+1;
@@ -83,8 +83,8 @@ const Pagination = ({count}) => {
   }
 
   if(pageCount<=1) return null;
-  console.log("currentPage ===> "+currentPage)
-  console.log("pageCount ===> "+pageCount)
+  //console.log("currentPage ===> "+currentPage)
+  //console.log("pageCount ===> "+pageCount)
   return (
     <StyledPagination>
       <p>

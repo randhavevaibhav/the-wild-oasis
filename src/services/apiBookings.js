@@ -34,12 +34,12 @@ export async function getBookings({ filter, sortBy ,page}) {
   if(page)
   {
     let from = (page-1)*PAGE_SIZE;
-    console.log("from ===> "+from)
+    //console.log("from ===> "+from)
    
     let to =from+PAGE_SIZE -1;
     
 
-    console.log("to ===> "+to)
+    //console.log("to ===> "+to)
     query = query.range(from,to);
   }
 

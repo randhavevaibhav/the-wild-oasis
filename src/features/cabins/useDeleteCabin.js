@@ -12,7 +12,7 @@ export const useDeleteCabin = () => {
       });
     },
 
-    onError: (err) => toast.error(err.message),
+    onError: () => toast.error("Error while deleting cabin"),
   });
 
   return { isDeleting, deleteCabin };

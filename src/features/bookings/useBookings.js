@@ -68,7 +68,7 @@ if(page>1)
 
 
 
-  console.log("data ===> "+JSON.stringify(count))
+  //console.log("data ===> "+JSON.stringify(count))
 
   return { isLoading, error, bookings,count };
 };

@@ -13,8 +13,8 @@ export const useEditCabin = ()=>{
         });
        
       },
-      onError: (err) => {
-        toast.error(err.message);
+      onError: () => {
+        toast.error("Error while editing the cabin");
       },
     });
 
