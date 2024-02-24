@@ -77,6 +77,7 @@ function BookingDetail() {
         <Modal.Window name="delete">
             <ConfirmDelete
               resourceName={`Booking which belongs to \n${guestName}`}
+              
               onConfirm={() => {
                 deleteBooking(bookingId,{
                   onSettled:()=>navigate(-1)
