@@ -44,8 +44,12 @@ const Filter = ({ filterField, options }) => {
     searchParams.set(filterField, value);
     //bug fix: if we select all filter in bookings and go to page 2 or 3
   //then if we select filter as check-out then application crash because here page no become 2 or 3(i.e, which ever the page no. is) and then that same search param (i.e., page) passed to check-out filter but that filter has only 8 records so we get query to fetch 15 records which resulted in error. so after every new filter application setting value of page to 1. below==>
+      if(searchParams.get("page"))
+      {
+        searchParams.set("page",1);
 
-    searchParams.set("page",1);
+      }
+    
     setSearchParams(searchParams);
   }
 
