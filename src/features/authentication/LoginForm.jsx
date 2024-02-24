@@ -5,6 +5,7 @@ import Input from "../../ui/Input";
 import FormRowVertical from "../../ui/FormRowVertical";
 import { useLogin } from "./useLogin";
 import SpinnerMini from "../../ui/SpinnerMini";
+import toast from "react-hot-toast";
 
 function LoginForm() {
   const [email, setEmail] = useState("test1@gmail.com");
@@ -13,13 +14,18 @@ function LoginForm() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    if(!email||!password) return;
-    login({email,password},{
-      onSettled:()=>{
-        setEmail("");
-        setPassword("");
-      }
-    })
+    if(!email||!password) {
+      toast.error("Missing Email or Password")
+    }else{
+      login({email,password},{
+        onSettled:()=>{
+          setEmail("");
+          setPassword("");
+        }
+      })
+
+    }
+    
     
 
   }
