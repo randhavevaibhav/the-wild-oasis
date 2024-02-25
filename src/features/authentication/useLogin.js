@@ -15,7 +15,11 @@ const {mutate:login,isLoading}=useMutation({
         
         queryClient.setQueriesData(["user"],user);
        
-        navigate("/dashboard")
+        // navigate("/dashboard")
+        
+
+        window.location.href = '/dashboard';
+
         console.log(user)
         
     },
