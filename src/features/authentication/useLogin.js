@@ -13,7 +13,7 @@ const {mutate:login,isLoading}=useMutation({
     }),
     onSuccess:(user)=>{
         
-        queryClient.setQueriesData(["user"],user);
+        queryClient.setQueryData(["user"],user.user);
        
         // navigate("/dashboard")
         
