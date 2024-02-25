@@ -14,6 +14,7 @@ const {mutate:login,isLoading}=useMutation({
     onSuccess:(user)=>{
         
         queryClient.setQueriesData(["user"],user);
+       
         navigate("/dashboard")
         console.log(user)
         
