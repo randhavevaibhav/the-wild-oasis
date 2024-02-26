@@ -8,16 +8,18 @@ import { useSignup } from "./useSingup";
 // Email regex: /\S+@\S+\.\S+/
 
 function SignupForm() {
-  const { register, formState,getValues,handleSubmit,reset } = useForm();
+  const { register, formState, getValues, handleSubmit, reset } = useForm();
   const { errors } = formState;
-  const {signup,isLoading}=useSignup();
+  const { signup, isLoading } = useSignup();
 
-  const onSubmit =({fullName,email,password})=>{
-    signup({fullName,email,password},{
-      onSettled:reset(),
-    })
-    
-  }
+  const onSubmit = ({ fullName, email, password }) => {
+    signup(
+      { fullName, email, password },
+      {
+        onSettled: reset(),
+      }
+    );
+  };
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <FormRow label="Full name" error={errors?.fullName?.message}>
@@ -44,15 +46,21 @@ function SignupForm() {
         />
       </FormRow>
 
-      <FormRow label="Password (min 8 characters)" error={errors?.password?.message}>
+      <FormRow
+        label="Password (min 8 characters)"
+        error={errors?.password?.message}
+      >
         <Input
           type="password"
           id="password"
           disabled={isLoading}
-          {...register("password", { required: "This field is required",minLength:{
-            value:8,
-            message:"Password needs to be 8 character long"
-          } })}
+          {...register("password", {
+            required: "This field is required",
+            minLength: {
+              value: 8,
+              message: "Password needs to be 8 character long",
+            },
+          })}
         />
       </FormRow>
 
@@ -63,17 +71,23 @@ function SignupForm() {
           disabled={isLoading}
           {...register("passwordConfirm", {
             required: "This field is required",
-            validate:(value)=>value===getValues().password||"Passwords need to match"
+            validate: (value) =>
+              value === getValues().password || "Passwords need to match",
           })}
         />
       </FormRow>
 
       <FormRow>
         {/* type is an HTML attribute! */}
-        <Button variation="secondary" type="reset" disabled={isLoading}>
+        <Button
+          variation="secondary"
+          type="reset"
+          onClick={reset}
+          disabled={isLoading}
+        >
           Cancel
         </Button>
-        <Button  disabled={isLoading}>Create new user</Button>
+        <Button disabled={isLoading}>Create new user</Button>
       </FormRow>
     </Form>
   );
