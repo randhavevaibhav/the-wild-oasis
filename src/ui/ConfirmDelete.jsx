@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import Button from "./Button";
 import Heading from "./Heading";
+import { useDarkMode } from "../context/DarkModeContex";
 
 const StyledConfirmDelete = styled.div`
   width: 40rem;
@@ -23,11 +24,13 @@ const StyledConfirmDelete = styled.div`
 
 
 function ConfirmDelete({ resourceName, onConfirm, disabled,onCloseModal }) {
+  const{isDarkMode}=useDarkMode();
+  const highlightTextColor = isDarkMode?"white":"black";
   return (
     <StyledConfirmDelete>
       <Heading as="h3">Delete {resourceName}</Heading>
       <p>
-        Are you sure you want to delete this <strong style={{color:"black"}}>{resourceName}</strong>  permanently? This
+        Are you sure you want to delete this {resourceName!="Cabins"?<strong style={{color:highlightTextColor}}>{resourceName}</strong>:"cabin"}  permanently? This
         action cannot be undone.
       </p>
 
