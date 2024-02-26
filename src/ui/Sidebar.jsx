@@ -19,7 +19,7 @@ const Sidebar = () => {
     <Logo/>
     <MainNav/>
     {/* use to upload dummy data */}
-    {/* <Uploader/> */}
+    <Uploader/>
 
    </StyledSidebar>
   )
