@@ -1,10 +1,16 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 import Heading from "../../ui/Heading";
 import Row from "../../ui/Row";
 import { useTodayActivity } from "./useTodayActivity";
 import Spinner from "../../ui/Spinner";
 import TodayItem from "./TodayItem";
+import { useShowHideSidebar } from "../../context/showHideSideBarContex";
+
+const displayonCond={
+  desktop: css`grid-column: 1 / span 2;`,
+  mobile:css`grid-column: 1 / -1;`
+}
 
 const StyledToday = styled.div`
   /* Box */
@@ -16,7 +22,7 @@ const StyledToday = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2.4rem;
-  grid-column: 1 / span 2;
+  ${props=>displayonCond[props.mode]};
   padding-top: 2.4rem;
 `;
 
@@ -38,11 +44,15 @@ const NoActivity = styled.p`
   font-weight: 500;
   margin-top: 0.8rem;
 `;
-
+StyledToday.defaultProps = {
+  
+  mode:"desktop"
+}
 function TodayActivity() {
   const { activities, isLoading } = useTodayActivity();
+  const {mode} = useShowHideSidebar();
   return (
-    <StyledToday>
+    <StyledToday mode={mode}>
       <Row type="horizontal">
         <Heading as="h2">Today</Heading>
       </Row>

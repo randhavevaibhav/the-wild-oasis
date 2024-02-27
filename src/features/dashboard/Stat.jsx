@@ -1,4 +1,16 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
+import { useShowHideSidebar } from "../../context/showHideSideBarContex";
+
+const displayonCond={
+  desktop: css`grid-template-columns: 6.4rem 1fr;`,
+  mobile:css`grid-template-columns: 1fr;`
+}
+const SVGOptions={
+  desktop: css` width: 3.2rem;
+  height: 3.2rem;`,
+  mobile:css` width: 3.2rem; height: 3.2rem;;
+  `
+}
 
 const StyledStat = styled.div`
   /* Box */
@@ -8,12 +20,17 @@ const StyledStat = styled.div`
 
   padding: 1.6rem;
   display: grid;
-  grid-template-columns: 6.4rem 1fr;
+  
+  ${props=>displayonCond[props.mode]};
   grid-template-rows: auto auto;
   column-gap: 1.6rem;
   row-gap: 0.4rem;
 `;
 
+StyledStat.defaultProps = {
+  
+  mode:"desktop"
+}
 const Icon = styled.div`
   grid-row: 1 / -1;
   aspect-ratio: 1;
@@ -26,11 +43,14 @@ const Icon = styled.div`
   background-color: var(--color-${(props) => props.color}-100);
 
   & svg {
-    width: 3.2rem;
-    height: 3.2rem;
+    ${props=>SVGOptions[props.mode]};
     color: var(--color-${(props) => props.color}-700);
   }
 `;
+Icon.defaultProps = {
+  
+  mode:"desktop"
+}
 
 const Title = styled.h5`
   align-self: end;
@@ -48,9 +68,10 @@ const Value = styled.p`
 `;
 
 function Stat({ icon, title, value, color }) {
+  const {mode} = useShowHideSidebar();
   return (
-    <StyledStat>
-      <Icon color={color}>{icon}</Icon>
+    <StyledStat mode={mode}>
+      <Icon color={color} mode={mode}>{icon}</Icon>
       <Title>{title}</Title>
       <Value>{value}</Value>
     </StyledStat>

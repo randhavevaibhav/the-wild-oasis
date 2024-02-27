@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import DashboardBox from "./DashboardBox";
 import Heading from "../../ui/Heading";
 import { eachDayOfInterval, subDays, format, isSameDay } from "date-fns";
@@ -12,9 +12,13 @@ import {
   YAxis,
 } from "recharts";
 import { useDarkMode } from "../../context/DarkModeContex";
-
+import { useShowHideSidebar } from "../../context/showHideSideBarContex";
+const displayonCond={
+  desktop: css` grid-column: 1 / -1;`,
+  mobile:css`grid-column:1 /-1;`
+}
 const StyledSalesChart = styled(DashboardBox)`
-  grid-column: 1 / -1;
+  ${props=>displayonCond[props.mode]};
 
   /* Hack to change grid line colors */
   & .recharts-cartesian-grid-horizontal line,
@@ -22,6 +26,12 @@ const StyledSalesChart = styled(DashboardBox)`
     stroke: var(--color-grey-300);
   }
 `;
+
+StyledSalesChart.defaultProps = {
+  
+  mode:"desktop"
+}
+
 
 const fakeData = [
   { label: "Jan 09", totalSales: 480, extrasSales: 20 },
@@ -57,6 +67,7 @@ const fakeData = [
 
 const SalesChart = ({ bookings, numDays }) => {
   const { isDarkMode } = useDarkMode();
+  const {mode} = useShowHideSidebar();
   const allDates = eachDayOfInterval({
     start: subDays(new Date(), numDays - 1),
     end: new Date(),
@@ -97,7 +108,7 @@ const SalesChart = ({ bookings, numDays }) => {
         background: "#fff",
       };
   return (
-    <StyledSalesChart>
+    <StyledSalesChart mode={mode}>
       <Heading as="h2">Sales from {format(allDates.at(0),"MMM dd yyyy") } &mdash; {format(allDates.at(-1),"MMM dd yyyy") }</Heading>
       <ResponsiveContainer height={300} width="100%">
         <AreaChart data={data}>

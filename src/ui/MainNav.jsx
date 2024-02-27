@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 import { HiOutlineCalendarDays, HiOutlineCog6Tooth, HiOutlineHome, HiOutlineHomeModern, HiOutlineUsers } from "react-icons/hi2";
+import { useShowHideSidebar } from "../context/showHideSideBarContex";
 const NavList = styled.ul`
   display: flex;
   flex-direction: column;
@@ -47,39 +48,40 @@ const StyledNavLink = styled(NavLink)`
 `;
 
 const MainNav = () => {
+  const {toggleHide}= useShowHideSidebar();
   return (
     <nav>
       <NavList>
         <li>
-          <StyledNavLink to="/dashboard">
+          <StyledNavLink to="/dashboard" onClick={toggleHide}>
             <HiOutlineHome />
             <span>Home</span>
           </StyledNavLink>
         </li>
 
         <li>
-          <StyledNavLink to="/bookings">
+          <StyledNavLink to="/bookings" onClick={toggleHide}>
             <HiOutlineCalendarDays />
             <span>Bookings</span>
           </StyledNavLink>
         </li>
 
         <li>
-          <StyledNavLink to="/cabins">
+          <StyledNavLink to="/cabins" onClick={toggleHide}>
             <HiOutlineHomeModern />
             <span>Cabins</span>
           </StyledNavLink>
         </li>
 
         <li>
-          <StyledNavLink to="/users">
+          <StyledNavLink to="/users" onClick={toggleHide}>
             <HiOutlineUsers />
             <span>Users</span>
           </StyledNavLink>
         </li>
 
         <li>
-          <StyledNavLink to="/settings">
+          <StyledNavLink to="/settings" onClick={toggleHide}>
             <HiOutlineCog6Tooth />
             <span>Settings</span>
           </StyledNavLink>

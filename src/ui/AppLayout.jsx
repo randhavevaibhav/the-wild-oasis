@@ -1,14 +1,32 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
+import useWindowDimensions from "../hooks/useWindowDimensions";
+import { useShowHideSidebar } from "../context/showHideSideBarContex";
 
+const templateColumnsOnWidth = {
+  mobile:css`grid-template-columns:none;`,
+  desktop:css`grid-template-columns:26rem 1fr;`
+}
+const MainContainerOptions = {
+  mobile:css`padding: 4rem 1.2rem 6.4rem;`,
+  desktop:css`padding: 4rem 4.8rem 6.4rem; `
+}
 const StyledAppLayOut = styled.div`
   display: grid;
-  grid-template-columns: 26rem 1fr;
+  
+ ${props=>templateColumnsOnWidth[props.mode]};
+  
   grid-template-rows: auto 1fr;
   height: 100vh;
 `;
+
+
+StyledAppLayOut.defaultProps = {
+  
+  mode:"desktop"
+}
 
 const Container = styled.div`
   max-width: 120rem;
@@ -20,17 +38,33 @@ const Container = styled.div`
 
 const Main = styled.main`
   background-color: var(--color-grey-50);
-  padding: 4rem 4.8rem 6.4rem; 
+  
+  ${props=>MainContainerOptions[props.mode]};
   overflow: scroll;
 `;
 
-const AppLayout = () => {
-  return (
-    <StyledAppLayOut>
-      <Header />
-      <Sidebar />
+Main.defaultProps = {
+  
+  mode:"desktop"
+}
 
-      <Main>
+const AppLayout = () => {
+  const { width } = useWindowDimensions();
+  const mode = width >1000?"desktop":"mobile";
+  const {hideSideBar} = useShowHideSidebar();
+  let showhideSidebar = true;
+ 
+  if(width<1000 )
+  {
+    showhideSidebar=hideSideBar;
+    
+  }
+  return (
+    <StyledAppLayOut mode={mode}>
+      <Header />
+     {showhideSidebar&& <Sidebar />}
+    
+      <Main mode={mode}>
         <Container>
           <Outlet />
         </Container>

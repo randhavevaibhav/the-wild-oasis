@@ -18,6 +18,7 @@ import Booking from "./pages/Booking";
 import Checkin from "./pages/Checkin";
 import ProtectedRoute from "./ui/ProtectedRoute";
 import { DarkModeProvider } from "./context/DarkModeContex";
+import {  ShowHideSideBarProvider } from "./context/showHideSideBarContex";
 
 
 const queryClient = new QueryClient({
@@ -30,6 +31,7 @@ const queryClient = new QueryClient({
 
 const App = () => {
   return (
+    <ShowHideSideBarProvider>
     <DarkModeProvider>
     <QueryClientProvider client={queryClient}>
       <ReactQueryDevtools initialIsOpen={false} />
@@ -71,6 +73,7 @@ const App = () => {
       }}/>
     </QueryClientProvider>
     </DarkModeProvider>
+    </ShowHideSideBarProvider>
 
   );
 };

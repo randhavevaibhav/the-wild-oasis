@@ -8,6 +8,7 @@ const StyledFilter = styled.div`
   border-radius: var(--border-radius-sm);
   padding: 0.4rem;
   display: flex;
+  justify-content: space-around;
   gap: 0.4rem;
 `;
 

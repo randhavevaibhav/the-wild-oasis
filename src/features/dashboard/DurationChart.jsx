@@ -1,8 +1,12 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import Heading from "../../ui/Heading";
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { useDarkMode } from "../../context/DarkModeContex";
-
+import { useShowHideSidebar } from "../../context/showHideSideBarContex";
+const displayonCond={
+  desktop: css` grid-column: 3 / span 2;`,
+  mobile:css`grid-column: 1 / -1;`
+}
 const ChartBox = styled.div`
   /* Box */
   background-color: var(--color-grey-0);
@@ -10,7 +14,8 @@ const ChartBox = styled.div`
   border-radius: var(--border-radius-md);
 
   padding: 2.4rem 3.2rem;
-  grid-column: 3 / span 2;
+  
+  ${props=>displayonCond[props.mode]};
 
   & > *:first-child {
     margin-bottom: 1.6rem;
@@ -20,6 +25,11 @@ const ChartBox = styled.div`
     font-weight: 600;
   }
 `;
+
+ChartBox.defaultProps = {
+  
+  mode:"desktop"
+}
 
 const startDataLight = [
   {
@@ -137,10 +147,11 @@ function prepareData(startData, stays) {
 const DurationChart = ({confirmedStays}) => {
   const {isDarkMode} = useDarkMode();
   const startData = isDarkMode?startDataDark:startDataLight;
-const data = prepareData(startData,confirmedStays)
+const data = prepareData(startData,confirmedStays);
+const {mode} =useShowHideSidebar();
 
   return (
-    <ChartBox>
+    <ChartBox mode={mode}>
       <Heading as="h2">Stay duration summary</Heading>
       <ResponsiveContainer width="100%" height={240}>
         <PieChart>
