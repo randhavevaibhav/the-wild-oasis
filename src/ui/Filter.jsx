@@ -1,5 +1,11 @@
 import { useSearchParams } from "react-router-dom";
 import styled, { css } from "styled-components";
+import { useShowHideSidebar } from "../context/showHideSideBarContex";
+
+const displayOptions = {
+  mobile:css`font-size: 1.2rem;`,
+  desktop:css`font-size: 1.4rem;`
+}
 
 const StyledFilter = styled.div`
   border: 1px solid var(--color-grey-100);
@@ -25,7 +31,7 @@ const FilterButton = styled.button`
 
   border-radius: var(--border-radius-sm);
   font-weight: 500;
-  font-size: 1.4rem;
+  ${props=>displayOptions[props.mode]};
   /* To give the same height as select */
   padding: 0.44rem 0.8rem;
   transition: all 0.3s;
@@ -35,11 +41,16 @@ const FilterButton = styled.button`
     color: var(--color-brand-50);
   }
 `;
+FilterButton.defaultProps={
+mode:"desktop"
+}
+
 
 const Filter = ({ filterField, options }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentFilter = searchParams.get(filterField) || options.at(0).value;
   
+  const {mode} = useShowHideSidebar();
   
   function handleClick(value) {
     searchParams.set(filterField, value);
@@ -62,6 +73,7 @@ const Filter = ({ filterField, options }) => {
           onClick={() => handleClick(option.value)}
           active={option.value === currentFilter}
           disabled={option.value === currentFilter}
+          mode={mode}
         >
           {option.label}
         </FilterButton>

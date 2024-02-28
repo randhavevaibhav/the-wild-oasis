@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { format, isToday } from "date-fns";
 import {
   HiOutlineChatBubbleBottomCenterText,
@@ -11,6 +11,7 @@ import DataItem from "../../ui/DataItem";
 import { Flag } from "../../ui/Flag";
 
 import { formatDistanceFromNow, formatCurrency } from "../../utils/helpers";
+import { useShowHideSidebar } from "../../context/showHideSideBarContex";
 
 const StyledBookingDataBox = styled.section`
   /* Box */
@@ -30,10 +31,22 @@ const Header = styled.header`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  ${(props) =>
+    props.mode==="mobile" &&
+    css`
+      padding: 0.4rem 1rem;
+    `}
 
   svg {
     height: 3.2rem;
     width: 3.2rem;
+    ${(props) =>
+    props.mode==="mobile" &&
+    css`
+      height: 10rem;
+    width: 10rem;
+    `}
+
   }
 
   & div:first-child {
@@ -41,7 +54,9 @@ const Header = styled.header`
     align-items: center;
     gap: 1.6rem;
     font-weight: 600;
-    font-size: 1.8rem;
+   
+    ${props=>displayOptions[props.mode]};
+    
   }
 
   & span {
@@ -51,9 +66,30 @@ const Header = styled.header`
   }
 `;
 
+const displayOptions = {
+  mobile:css`font-size: 1.4rem;`,
+  desktop:css`font-size: 1.8rem;`
+}
+const sectionDisplayOptions = {
+  mobile:css`padding: 3.2rem 1rem 1.2rem;`,
+  desktop:css`padding: 3.2rem 4rem 1.2rem;`
+}
+
 const Section = styled.section`
-  padding: 3.2rem 4rem 1.2rem;
+  ${props=>sectionDisplayOptions[props.mode]};
+
 `;
+
+Section.defaultProps = {
+  
+  mode:"desktop"
+}
+
+const GuestDisplayOptions = {
+  mobile:css`flex-direction: column;`,
+  desktop:css`flex-direction: row;`
+}
+
 
 const Guest = styled.div`
   display: flex;
@@ -61,6 +97,7 @@ const Guest = styled.div`
   gap: 1.2rem;
   margin-bottom: 1.6rem;
   color: var(--color-grey-500);
+  ${props=>GuestDisplayOptions[props.mode]};
 
   & p:first-of-type {
     font-weight: 500;
@@ -68,11 +105,20 @@ const Guest = styled.div`
   }
 `;
 
+Guest.defaultProps = {
+  
+  mode:"desktop"
+}
+const PriceDisplayOptions = {
+  mobile:css`padding: 0.6rem 1.2rem;`,
+  desktop:css`padding: 1.6rem 3.2rem;`
+}
+
 const Price = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.6rem 3.2rem;
+  ${props=>PriceDisplayOptions[props.mode]};
   border-radius: var(--border-radius-sm);
   margin-top: 2.4rem;
 
@@ -93,6 +139,11 @@ const Price = styled.div`
     color: currentColor !important;
   }
 `;
+
+Price.defaultProps = {
+  
+  mode:"desktop"
+}
 
 const Footer = styled.footer`
   padding: 1.6rem 4rem;
@@ -118,16 +169,17 @@ function BookingDataBox({ booking }) {
     guests: { fullName: guestName, email, country, countryFlag, nationalID },
     cabins: { name: cabinName },
   } = booking;
+  const {mode} = useShowHideSidebar();
 
   return (
     <StyledBookingDataBox>
-      <Header>
+      <Header mode={mode}>
         <div>
           <HiOutlineHomeModern />
           <p>
             {numNights} nights in Cabin <span>{cabinName}</span>
           </p>
-        </div>
+       
 
         <p>
           {format(new Date(startDate), "EEE, MMM dd yyyy")} (
@@ -136,17 +188,18 @@ function BookingDataBox({ booking }) {
             : formatDistanceFromNow(startDate)}
           ) &mdash; {format(new Date(endDate), "EEE, MMM dd yyyy")}
         </p>
+        </div>
       </Header>
 
-      <Section>
-        <Guest>
+      <Section mode={mode}>
+        <Guest mode={mode}>
           {countryFlag && <Flag src={countryFlag} alt={`Flag of ${country}`} />}
           <p>
             {guestName} {numGuests > 1 ? `+ ${numGuests - 1} guests` : ""}
           </p>
-          <span>&bull;</span>
+          <span style={{display:mode==="mobile"?"none":""}}>&bull;</span>
           <p>{email}</p>
-          <span>&bull;</span>
+          <span style={{display:mode==="mobile"?"none":""}}>&bull;</span>
           <p>National ID {nationalID}</p>
         </Guest>
 
@@ -163,7 +216,7 @@ function BookingDataBox({ booking }) {
           {hasBreakfast ? "Yes" : "No"}
         </DataItem>
 
-        <Price isPaid={isPaid}>
+        <Price isPaid={isPaid} mode={mode}>
           <DataItem icon={<HiOutlineCurrencyDollar />} label={`Total price`}>
             {formatCurrency(totalPrice)}
 

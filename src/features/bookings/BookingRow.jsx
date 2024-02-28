@@ -18,6 +18,7 @@ import { useCheckout } from "../check-in-out/useCheckout";
 import Modal from "../../ui/Modal";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import { useDeleteBooking } from "./useDeleteBooking";
+import { useShowHideSidebar } from "../../context/showHideSideBarContex";
 
 const Cabin = styled.div`
   font-size: 1.6rem;
@@ -68,6 +69,7 @@ function BookingRow({
     "checked-in": "green",
     "checked-out": "silver",
   };
+  
 
   return (
     <Table.Row>

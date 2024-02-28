@@ -5,10 +5,12 @@ import Empty from "../../ui/Empty";
 import { useBookings } from "./useBookings";
 import Spinner from "../../ui/Spinner";
 import Pagination from "../../ui/Pagination";
+import { useShowHideSidebar } from "../../context/showHideSideBarContex";
 
 function BookingTable() {
  
   const {bookings,isLoading,count} = useBookings();
+  const {mode} = useShowHideSidebar();
   if(isLoading) return <Spinner/>
   // if(!isLoading)
   // {
@@ -22,8 +24,8 @@ function BookingTable() {
 
   return (
     <Menus>
-      <Table columns="0.6fr 2fr 2.4fr 1.4fr 1fr 3.2rem">
-        <Table.Header>
+      <Table columns={mode==="desktop"?"0.6fr 2fr 2.4fr 1.4fr 1fr 3.2rem":"1fr"} mode={mode}>
+        <Table.Header >
           <div>Cabin</div>
           <div>Guest</div>
           <div>Dates</div>

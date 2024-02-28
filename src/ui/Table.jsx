@@ -1,5 +1,7 @@
 import { createContext, useContext } from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
+import { useShowHideSidebar } from "../context/showHideSideBarContex";
+
 
 const StyledTable = styled.div`
   border: 1px solid var(--color-grey-200);
@@ -10,13 +12,18 @@ const StyledTable = styled.div`
   overflow: hidden;
 `;
 
+
+
+
 const CommonRow = styled.div`
   display: grid;
   grid-template-columns: ${(props) => props.columns};
   column-gap: 2.4rem;
+  
   align-items: center;
   transition: none;
 `;
+
 
 const StyledHeader = styled(CommonRow)`
   padding: 1.6rem 2.4rem;
@@ -27,15 +34,36 @@ const StyledHeader = styled(CommonRow)`
   letter-spacing: 0.4px;
   font-weight: 600;
   color: var(--color-grey-600);
+  ${props=>displayHeaderOptions[props.mode]};
 `;
+const displayHeaderOptions = {
+  mobile:css`gap:0.7rem;`,
+  desktop:css`gap:0rem;`
+}
+
+StyledHeader.defaultProps = {
+  
+  mode:"desktop"
+}
 
 const StyledRow = styled(CommonRow)`
   padding: 1.2rem 2.4rem;
-
+  ${props=>displayRowOptions[props.mode]};
   &:not(:last-child) {
     border-bottom: 1px solid var(--color-grey-100);
   }
 `;
+
+const displayRowOptions = {
+  mobile:css`gap:1rem;`,
+  desktop:css`gap:0;`
+}
+
+StyledRow.defaultProps = {
+  
+  mode:"desktop"
+}
+
 
 const StyledBody = styled.section`
   margin: 0.4rem 0;
@@ -63,6 +91,7 @@ const Empty = styled.p`
 const TableContex = createContext();
 
 function Table({ columns, children }) {
+  
   return (
     <TableContex.Provider value={{ columns }}>
       <StyledTable role="table">{children}</StyledTable>
@@ -71,16 +100,18 @@ function Table({ columns, children }) {
 }
 function Header({ children }) {
   const { columns } = useContext(TableContex);
+  const {mode} = useShowHideSidebar();
   return (
-    <StyledHeader role="row" columns={columns} as="header">
+    <StyledHeader role="row" columns={columns} mode={mode} as="header">
       {children}
     </StyledHeader>
   );
 }
 function Row({ children }) {
   const { columns } = useContext(TableContex);
+  const {mode} = useShowHideSidebar();
   return (
-    <StyledRow role="row" columns={columns}>
+    <StyledRow role="row" columns={columns} mode={mode}>
       {children}
     </StyledRow>
   );

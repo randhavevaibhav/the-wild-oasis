@@ -16,11 +16,13 @@ const Row = styled.div`
       gap:1.6rem;
       
     `}
+    
 
 `;
 
 Row.defaultProps={
-    type:"vertical"
+    type:"vertical",
+   
 }
 
 export default Row;

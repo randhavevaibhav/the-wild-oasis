@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 import BookingDataBox from "./BookingDataBox";
 import Row from "../../ui/Row";
@@ -18,18 +18,28 @@ import Modal from "../../ui/Modal";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import { useDeleteBooking } from "./useDeleteBooking";
 import Empty from "../../ui/Empty";
-
+import { useShowHideSidebar } from "../../context/showHideSideBarContex";
+const displayOptions = {
+  mobile:css`justify-content:space-between;`,
+  desktop:css`justify-content:flex-start;`
+}
 const HeadingGroup = styled.div`
   display: flex;
   gap: 2.4rem;
   align-items: center;
+  ${props=>displayOptions[props.mode]};
 `;
+HeadingGroup.defaultProps = {
+  
+  mode:"desktop"
+}
 
 function BookingDetail() {
   const { booking, isLoading } = useBooking();
   const {checkout,isChekingOut}=useCheckout();
   const { isDeleting, deleteBooking } = useDeleteBooking();
   const navigate = useNavigate();
+  const {mode} = useShowHideSidebar();
 
   const moveBack = useMoveBack();
   if (isLoading) return <Spinner />;
@@ -41,11 +51,12 @@ function BookingDetail() {
     "checked-in": "green",
     "checked-out": "silver",
   };
+  
 
   return (
     <>
-      <Row type="horizontal">
-        <HeadingGroup>
+      <Row type={mode==="desktop"?"horizontal":"vertical"} >
+        <HeadingGroup  mode={mode}>
           <Heading as="h1">Booking #{bookingId}</Heading>
           <Tag type={statusToTagName[status]}>{status.replace("-", " ")}</Tag>
         </HeadingGroup>
@@ -66,6 +77,7 @@ function BookingDetail() {
             icon={<HiArrowUpOnSquare />}
             onClick={() => checkout(bookingId)}
             disable={isChekingOut}
+            size={mode==="mobile"?"medium":""}
           >
             Check-out
           </Button>
@@ -73,7 +85,7 @@ function BookingDetail() {
          
         <Modal>
         <Modal.Open opens="delete">
-        <Button variation="danger">Delete Booking</Button>
+        <Button variation="danger" size={mode==="mobile"?"medium":""}>Delete Booking</Button>
             </Modal.Open>
 
         <Modal.Window name="delete">
@@ -92,7 +104,7 @@ function BookingDetail() {
           </Modal.Window>
         </Modal>
        
-        <Button variation="secondary" onClick={moveBack}>
+        <Button size={mode==="mobile"?"small":""} variation="secondary" onClick={moveBack}>
           Back
         </Button>
       </ButtonGroup>

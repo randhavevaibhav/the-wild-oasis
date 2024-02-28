@@ -1,10 +1,12 @@
 import SortBy from "../../ui/SortBy";
 import Filter from "../../ui/Filter";
 import TableOperations from "../../ui/TableOperations";
+import { useShowHideSidebar } from "../../context/showHideSideBarContex";
 
 function BookingTableOperations() {
+  const {mode} = useShowHideSidebar();
   return (
-    <TableOperations>
+    <TableOperations mode={mode}>
       <Filter
         filterField="status"
         options={[
