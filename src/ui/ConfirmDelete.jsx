@@ -1,13 +1,20 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import Button from "./Button";
 import Heading from "./Heading";
 import { useDarkMode } from "../context/DarkModeContex";
+import { useShowHideSidebar } from "../context/showHideSideBarContex";
 
 const StyledConfirmDelete = styled.div`
   width: 40rem;
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
+  ${(props) =>
+    props.mode==="mobile"&&
+    css`
+      width: 100%;
+    `}
+
 
   & p {
     color: var(--color-grey-500);
@@ -25,9 +32,10 @@ const StyledConfirmDelete = styled.div`
 
 function ConfirmDelete({ resourceName, onConfirm, disabled,onCloseModal }) {
   const{isDarkMode}=useDarkMode();
+  const {mode} = useShowHideSidebar();
   const highlightTextColor = isDarkMode?"white":"black";
   return (
-    <StyledConfirmDelete>
+    <StyledConfirmDelete mode={mode}>
       <Heading as="h3">Delete {resourceName}</Heading>
       <p>
         Are you sure you want to delete this {resourceName!="Cabins"?<strong style={{color:highlightTextColor}}>{resourceName}</strong>:"cabin"}  permanently? This

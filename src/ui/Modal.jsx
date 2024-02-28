@@ -1,9 +1,13 @@
 import { cloneElement, createContext, useContext, useState } from "react";
 import { createPortal } from "react-dom";
 import { HiXMark } from "react-icons/hi2";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { useOutsideClick } from "../hooks/useOutsideClick";
-
+import { useShowHideSidebar } from "../context/showHideSideBarContex";
+const ModalDisplayOptions = {
+  mobile:css`grid-template-columns:none;`,
+  desktop:css`grid-template-columns:26rem 1fr;`
+}
 const StyledModal = styled.div`
   position: fixed;
   top: 50%;
@@ -14,6 +18,11 @@ const StyledModal = styled.div`
   box-shadow: var(--shadow-lg);
   padding: 3.2rem 4rem;
   transition: all 0.5s;
+  ${(props) =>
+    props.mode==="mobile" &&
+    css`
+     width: 92%;
+    `}
 `;
 
 const Overlay = styled.div`
@@ -77,17 +86,18 @@ function Open({ children, opens: opensWindowName }) {
 function Window({ children, name }) {
   const { openName, close } = useContext(ModalContext);
   const ref = useOutsideClick(close);
+  const {mode} = useShowHideSidebar();
 
   if (name !== openName) return null;
  
   return createPortal(
     <Overlay>
-      <StyledModal ref={ref}>
+      <StyledModal ref={ref} mode={mode}>
         <Button onClick={close}>
           <HiXMark />
         </Button>
 
-        <div>{cloneElement(children, { onCloseModal: close })}</div>
+        <div style={{width:mode==="mobile"?"100%":""}}>{cloneElement(children, { onCloseModal: close })}</div>
       </StyledModal>
     </Overlay>,
     document.body
