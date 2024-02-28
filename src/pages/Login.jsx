@@ -5,14 +5,17 @@ import Logo from "../ui/Logo";
 import { useShowHideSidebar } from "../context/showHideSideBarContex";
 
 const displayOptions = {
-  mobile:css`grid-template-columns: 35rem;`,
-  desktop:css`grid-template-columns: 35rem;`
+  mobile:css`grid-template-columns: 32rem;
+  align-content:flex-start;
+  padding-top: 3rem;`,
+  desktop:css`grid-template-columns: 46rem;
+  align-content: center;`
 }
 const LoginLayout = styled.main`
   min-height: 100vh;
   display: grid;
   ${props=>displayOptions[props.mode]};
-  align-content: center;
+  
   justify-content: center;
   gap: 3.2rem;
   background-color: var(--color-grey-50);

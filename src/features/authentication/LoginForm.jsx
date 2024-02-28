@@ -6,11 +6,13 @@ import FormRowVertical from "../../ui/FormRowVertical";
 import { useLogin } from "./useLogin";
 import SpinnerMini from "../../ui/SpinnerMini";
 import toast from "react-hot-toast";
+import { useShowHideSidebar } from "../../context/showHideSideBarContex";
 
 function LoginForm() {
-  const [email, setEmail] = useState("test1@gmail.com");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("test11@gmail.com");
+  const [password, setPassword] = useState("Pass@1234");
   const{login,isLoading} = useLogin();
+  const {mode} = useShowHideSidebar();
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -31,7 +33,7 @@ function LoginForm() {
   }
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={handleSubmit} mode={mode}>
       <FormRowVertical label="Email address">
         <Input
           type="email"

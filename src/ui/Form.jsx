@@ -4,7 +4,7 @@ const Form = styled.form`
   ${(props) =>
     props.type === "regular" &&
     css`
-      padding: 2.4rem 4rem;
+     
 
       /* Box */
       background-color: var(--color-grey-0);
@@ -17,13 +17,27 @@ const Form = styled.form`
     css`
       width: 80rem;
     `}
+
+    ${(props) =>
+    props.mode === "mobile" &&
+    css`
+     padding: 1rem 1.2rem;
+    
+    `}
+    ${(props) =>
+    props.mode === "desktop" &&
+    css`
+     padding: 2.4rem 4rem;
+    
+    `}
     
   overflow: hidden;
   font-size: 1.4rem;
 `;
 
 Form.defaultProps={
-  type:"regular"
+  type:"regular",
+  mode:"desktop"
 }
 
 export default Form;
