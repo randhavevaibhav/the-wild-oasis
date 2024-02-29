@@ -4,13 +4,14 @@ import CabinTable from "../features/cabins/CabinTable";
 
 import AddCabin from "../features/cabins/AddCabin";
 import CabinTableOperations from "../features/cabins/CabinTableOperations";
+import { useShowHideSidebar } from "../context/showHideSideBarContex";
 
  
 function Cabins() {
-
+const {mode} = useShowHideSidebar();
   return (
     <>
-      <Row type="horizontal">
+      <Row type={mode==="mobile"?"vertical":"horizontal"} style={{alignItems:mode==="mobile"?"center":"flex-start"}}>
         <Heading as="h1">All cabins</Heading>
         <CabinTableOperations/>
       </Row>

@@ -1,10 +1,12 @@
 import TableOperations from "../../ui/TableOperations";
 import Filter from "../../ui/Filter";
 import SortBy from "../../ui/SortBy";
+import { useShowHideSidebar } from "../../context/showHideSideBarContex";
 
 const CabinTableOperations = () => {
+  const {mode} = useShowHideSidebar();
   return (
-    <TableOperations>
+    <TableOperations mode={mode}>
       <Filter
         filterField="discount"
         options={[

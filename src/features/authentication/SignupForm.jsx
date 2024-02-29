@@ -4,6 +4,8 @@ import Form from "../../ui/Form";
 import FormRow from "../../ui/FormRow";
 import Input from "../../ui/Input";
 import { useSignup } from "./useSingup";
+import { useShowHideSidebar } from "../../context/showHideSideBarContex";
+
 
 // Email regex: /\S+@\S+\.\S+/
 
@@ -11,6 +13,8 @@ function SignupForm() {
   const { register, formState, getValues, handleSubmit, reset } = useForm();
   const { errors } = formState;
   const { signup, isLoading } = useSignup();
+  const {mode} = useShowHideSidebar();
+  
 
   const onSubmit = ({ fullName, email, password }) => {
     signup(
@@ -21,7 +25,7 @@ function SignupForm() {
     );
   };
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form onSubmit={handleSubmit(onSubmit)} mode={mode}>
       <FormRow label="Full name" error={errors?.fullName?.message}>
         <Input
           type="text"

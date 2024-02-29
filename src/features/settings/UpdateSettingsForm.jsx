@@ -1,3 +1,4 @@
+import { useShowHideSidebar } from "../../context/showHideSideBarContex";
 import Form from "../../ui/Form";
 import FormRow from "../../ui/FormRow";
 import Input from "../../ui/Input";
@@ -16,6 +17,7 @@ function UpdateSettingsForm() {
     } = {},
   } = useSettings();
   const { isUpdating, updateSetting } = useUpdateSetting();
+  const{mode} = useShowHideSidebar();
 
   if (isLoading) return <Spinner />;
 
@@ -25,7 +27,7 @@ function UpdateSettingsForm() {
     updateSetting({ [field]: value });
   };
   return (
-    <Form>
+    <Form mode={mode}>
       <FormRow label="Minimum nights/booking">
         <Input
           type="number"

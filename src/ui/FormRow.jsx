@@ -1,10 +1,23 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
+import { useShowHideSidebar } from "../context/showHideSideBarContex";
+
+
+const displayOptions = {
+  mobile:css`grid-template-columns: 1fr; gap:0rem;`,
+  desktop:css`grid-template-columns: 24rem 1fr 1.2fr; gap:2.4rem;`
+}
+
+const ButtonDisplayOptions = {
+  mobile:css`justify-content: space-between;`,
+  desktop:css`justify-content: flex-end;`
+}
 
 const StyledFormRow = styled.div`
   display: grid;
   align-items: center;
-  grid-template-columns: 24rem 1fr 1.2fr;
-  gap: 2.4rem;
+  
+  ${props=>displayOptions[props.mode]};
+  
 
   padding: 1.2rem 0;
 
@@ -22,10 +35,16 @@ const StyledFormRow = styled.div`
 
   &:has(button) {
     display: flex;
-    justify-content: flex-end;
+    ${props=>ButtonDisplayOptions[props.mode]};
     gap: 1.2rem;
   }
 `;
+
+
+StyledFormRow.defaultProps = {
+  
+  mode:"desktop"
+}
 
 const Label = styled.label`
   font-weight: 500;
@@ -37,8 +56,9 @@ const Error = styled.span`
 `;
 
 const FormRow = ({label,error,children}) => {
+  const {mode} = useShowHideSidebar();
   return (
-    <StyledFormRow>
+    <StyledFormRow mode={mode}>
    {label&&<Label htmlFor={children.props.id}>{label}</Label>} 
     {children}
     {error&&<Error> {error}</Error>}
