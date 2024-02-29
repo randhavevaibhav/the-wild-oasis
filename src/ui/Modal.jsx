@@ -22,6 +22,12 @@ const StyledModal = styled.div`
     props.mode==="mobile" &&
     css`
      width: 92%;
+     padding-left:1rem ;
+
+    padding-right:1rem;
+    padding-bottom: 0rem;
+    padding-top: 1rem;
+     top: 47%;
     `}
 `;
 

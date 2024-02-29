@@ -4,11 +4,13 @@ import Form from "../../ui/Form";
 import FormRow from "../../ui/FormRow";
 import Input from "../../ui/Input";
 import { useUpdateUser } from "./useUpdateUser";
+import { useShowHideSidebar } from "../../context/showHideSideBarContex";
 
 
 function UpdatePasswordForm() {
   const { register, handleSubmit, formState, getValues, reset } = useForm();
   const { errors } = formState;
+  const {mode} = useShowHideSidebar();
 
   const { updateCurrentUser, isUpdating } = useUpdateUser();
 
@@ -17,7 +19,7 @@ function UpdatePasswordForm() {
   }
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form onSubmit={handleSubmit(onSubmit)} mode={mode}>
       <FormRow
         label="Password (min 8 characters)"
         error={errors?.password?.message}

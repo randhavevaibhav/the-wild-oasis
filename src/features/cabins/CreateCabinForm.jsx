@@ -9,6 +9,7 @@ import FormRow from "../../ui/FormRow";
 
 import { useCreateCabin } from "./useCreateCabin";
 import { useEditCabin } from "./useEditCabin";
+import { useShowHideSidebar } from "../../context/showHideSideBarContex";
 
 function CreateCabinForm({ cabinToEdit = {},onCloseModal }) {
   const { isCreating, createCabin } = useCreateCabin();
@@ -16,6 +17,7 @@ function CreateCabinForm({ cabinToEdit = {},onCloseModal }) {
   const { isEditing, editCabin } = useEditCabin();
 
   const isWorking = isCreating || isEditing;
+  const {mode} = useShowHideSidebar();
 
   const { id: editId, ...editValues } = cabinToEdit;
   const isEditSession = Boolean(editId);
@@ -46,7 +48,7 @@ function CreateCabinForm({ cabinToEdit = {},onCloseModal }) {
     //console.log("errors in form ===> "+errors.description.message);
   };
   return (
-    <Form onSubmit={handleSubmit(onSubmit, onError)} type={onCloseModal?'modal':"regular"}>
+    <Form onSubmit={handleSubmit(onSubmit, onError)} type={onCloseModal?'modal':"regular"} mode={mode}>
       <FormRow label="Cabin name" error={errors?.name?.message}>
         <Input
           type="text"

@@ -21,7 +21,8 @@ const Form = styled.form`
     ${(props) =>
     props.mode === "mobile" &&
     css`
-     padding: 2rem 2rem;
+     padding: 2rem 1rem;
+     width: 100%;
     
     `}
     ${(props) =>
