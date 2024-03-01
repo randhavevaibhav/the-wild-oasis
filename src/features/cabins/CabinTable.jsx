@@ -6,10 +6,13 @@ import Table from "../../ui/Table";
 import Menus from "../../ui/Menus";
 import { useSearchParams } from "react-router-dom";
 import Empty from "../../ui/Empty";
+import { useShowHideSidebar } from "../../context/showHideSideBarContex";
 
 const CabinTable = () => {
   const { isLoading, cabins } = useCabins();
   const [searchParams] = useSearchParams();
+  const {mode} = useShowHideSidebar();
+  const TableColums = mode==="mobile"?"1fr 1fr":"0.6fr 1.8fr 2.2fr 1fr 1fr 1fr"
   if(!isLoading)
   {
     if(!cabins.length) return <Empty resourceName="Cabins"/>
@@ -57,15 +60,15 @@ const CabinTable = () => {
 
   return (
     <Menus>
-      <Table columns="0.6fr 1.8fr 2.2fr 1fr 1fr 1fr">
-        <Table.Header>
+      <Table columns={TableColums}>
+       { mode==="desktop"&&<Table.Header>
           <div></div>
           <div>Cabin</div>
           <div>Capacity</div>
           <div>Price</div>
           <div>Discount</div>
           <div></div>
-        </Table.Header>
+        </Table.Header>}
         <Table.Body
           data={sortedCabins}
           render={(cabin) => <CabinRow cabin={cabin} key={cabin.id} />}

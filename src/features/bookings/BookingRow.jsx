@@ -62,6 +62,7 @@ function BookingRow({
   },
 }) {
   const navigate = useNavigate();
+  const {mode} = useShowHideSidebar();
   const { checkout, isChekingOut } = useCheckout();
   const { isDeleting, deleteBooking } = useDeleteBooking();
   const statusToTagName = {
@@ -73,14 +74,17 @@ function BookingRow({
 
   return (
     <Table.Row>
+      {mode==="mobile"&&<div>Cabin</div>}
       <Cabin>{cabinName}</Cabin>
-
+      {mode==="mobile"&&<div>Guest</div>}
       <Stacked>
+      
         <span>{guestName}</span>
         <span>{email}</span>
       </Stacked>
-
+      {mode==="mobile"&&<div>Dates</div>}
       <Stacked>
+      
         <span>
           {isToday(new Date(startDate))
             ? "Today"
@@ -92,10 +96,11 @@ function BookingRow({
           {format(new Date(endDate), "MMM dd yyyy")}
         </span>
       </Stacked>
-
+      {mode==="mobile"&&<div>Status</div>}
       <Tag type={statusToTagName[status]}>{status.replace("-", " ")}</Tag>
-
+      {mode==="mobile"&&<div>Amount</div>}
       <Amount>{formatCurrency(totalPrice)}</Amount>
+      {mode==="mobile"&&<div></div>}
       <Modal>
         <Menus.Menu>
           <Menus.Toggle id={bookingId} />

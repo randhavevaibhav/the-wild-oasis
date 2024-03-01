@@ -9,6 +9,7 @@ import Modal from "../../ui/Modal";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import Table from "../../ui/Table";
 import Menus from "../../ui/Menus";
+import { useShowHideSidebar } from "../../context/showHideSideBarContex";
 // const TableRow = styled.div`
 //   display: grid;
 //   grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
@@ -51,6 +52,7 @@ const Discount = styled.div`
 const CabinRow = ({ cabin }) => {
   const { isDeleting, deleteCabin } = useDeleteCabin();
   const { isCreating, createCabin } = useCreateCabin();
+  const {mode} = useShowHideSidebar();
   const {
     id: cabinId,
     name,
@@ -73,47 +75,54 @@ const CabinRow = ({ cabin }) => {
   };
 
   return (
-    <Table.Row>
-      <Img src={image} />
-      <Cabin>{name}</Cabin>
-      <div>Fits up to {maxCapacity}</div>
-      <Price>{formatCurrency(regularPrice)}</Price>
-      {discount ? (
-        <Discount>{formatCurrency(discount)}</Discount>
-      ) : (
-        <span>&mdash;</span>
-      )}
-      <div>
-        <Modal>
-          <Menus.Menu>
-            <Menus.Toggle id={cabinId} />
-            <Menus.List id={cabinId}>
-              <Menus.Button icon={<HiSquare2Stack />} onClick={handleDuplicate}>
-                Duplicate
-              </Menus.Button>
-              <Modal.Open opens="edit">
-                <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
-              </Modal.Open>
-              <Modal.Open opens="delete">
-                <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
-              </Modal.Open>
-            </Menus.List>
+    <Table.Row>  
+          
+    <Img src={image} />
+    {mode ==="mobile"&&<div></div>}
+    {mode ==="mobile"&&<div>Cabin</div>}
+    <Cabin>{name}</Cabin>
+    {mode ==="mobile"&&<div>Capacity</div>}
+    <div>Fits up to {maxCapacity}</div>
+    {mode ==="mobile"&&<div>Price</div>}
+    <Price>{formatCurrency(regularPrice)}</Price>
+    {mode ==="mobile"&&<div>Discount</div>}
+    {discount ? (
+      <Discount>{formatCurrency(discount)}</Discount>
+    ) : (
+      <span>&mdash;</span>
+    )}
+    {mode ==="mobile"&& <div></div>}
+    <div>
+      <Modal>
+        <Menus.Menu>
+          <Menus.Toggle id={cabinId} />
+          <Menus.List id={cabinId}>
+            <Menus.Button icon={<HiSquare2Stack />} onClick={handleDuplicate}>
+              Duplicate
+            </Menus.Button>
+            <Modal.Open opens="edit">
+              <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
+            </Modal.Open>
+            <Modal.Open opens="delete">
+              <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
+            </Modal.Open>
+          </Menus.List>
 
-            <Modal.Window name="edit">
-              <CreateCabinForm cabinToEdit={cabin} />
-            </Modal.Window>
+          <Modal.Window name="edit">
+            <CreateCabinForm cabinToEdit={cabin} />
+          </Modal.Window>
 
-            <Modal.Window name="delete">
-              <ConfirmDelete
-                resourceName="Cabins"
-                disabled={isDeleting}
-                onConfirm={() => deleteCabin(cabinId)}
-              />
-            </Modal.Window>
-          </Menus.Menu>
-        </Modal>
-      </div>
-    </Table.Row>
+          <Modal.Window name="delete">
+            <ConfirmDelete
+              resourceName="Cabins"
+              disabled={isDeleting}
+              onConfirm={() => deleteCabin(cabinId)}
+            />
+          </Modal.Window>
+        </Menus.Menu>
+      </Modal>
+    </div>
+  </Table.Row>
   );
 };
 
