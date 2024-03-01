@@ -24,6 +24,9 @@ const ChartBox = styled.div`
   & .recharts-pie-label-text {
     font-weight: 600;
   }
+ 
+
+  
 `;
 
 ChartBox.defaultProps = {
@@ -149,24 +152,31 @@ const DurationChart = ({confirmedStays}) => {
   const startData = isDarkMode?startDataDark:startDataLight;
 const data = prepareData(startData,confirmedStays);
 const {mode} =useShowHideSidebar();
+const pieCxPos = mode==="mobile"?"50%":"40%";
+const pieCyPos = mode==="mobile"?"40%":"50%";
+const resContHeight = mode==="mobile"?400:240;
+const legendVerticalAlign = mode==="mobile"?"bottom":"middle";
+const legendAlign = mode==="mobile"?"center":"right";
+const legendLayout = mode==="mobile"?"horizontal":"vertical";
+const legendWidth = mode==="mobile"?"110%":"30%";
 
   return (
     <ChartBox mode={mode}>
       <Heading as="h2">Stay duration summary</Heading>
-      <ResponsiveContainer width="100%" height={240}>
-        <PieChart>
+      <ResponsiveContainer width="100%" height={resContHeight} >
+        <PieChart >
           <Pie
             data={data}
             nameKey="duration"
             dataKey="value"
             innerRadius={85}
             outerRadius={110}
-            cx="40%"
-            cy="50%"
+            cx={pieCxPos}
+            cy={pieCyPos}
             paddingAngle={3}
           >
             {data.map((entry) => (
-              <Cell
+              <Cell 
                 fill={entry.color}
                 stroke={entry.color}
                 key={entry.duration}
@@ -175,12 +185,19 @@ const {mode} =useShowHideSidebar();
           </Pie>
           <Tooltip/>
           <Legend
-            verticalAlign="middle"
-            align="right"
-            width="30%"
-            layout="vertical"
+            // verticalAlign="middle"
+            verticalAlign={legendVerticalAlign}
+            // align="right"
+            align={legendAlign}
+            // width="30%"
+            width={legendWidth}
+            // layout="vertical"
+            layout={legendLayout}
             iconSize={15}
             iconType="circle"
+            
+            
+           
           />
         </PieChart>
       </ResponsiveContainer>
