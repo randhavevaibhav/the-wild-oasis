@@ -50,7 +50,20 @@ const StyledRow = styled(CommonRow)`
   padding: 1.2rem 2.4rem;
   ${props=>displayRowOptions[props.mode]};
   &:not(:last-child) {
-    border-bottom: 1px solid var(--color-grey-100);
+    ${(props) =>
+    props.mode==="mobile" &&
+    css`
+      border-bottom: 2px solid var(--color-grey-400);
+    `}
+
+    ${(props) =>
+    props.mode==="desktop" &&
+    css`
+      border-bottom: 1px solid var(--color-grey-100);
+    `}
+
+    
+    
   }
 `;
 
