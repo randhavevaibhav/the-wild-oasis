@@ -17,6 +17,8 @@ const StyledFormRow = styled.div`
   align-items: center;
   
   ${props=>displayOptions[props.mode]};
+
+  
   
 
   padding: 1.2rem 0;
@@ -24,6 +26,7 @@ const StyledFormRow = styled.div`
   &:first-child {
     padding-top: 0;
   }
+ 
 
   &:last-child {
     padding-bottom: 0;
@@ -38,12 +41,17 @@ const StyledFormRow = styled.div`
     ${props=>ButtonDisplayOptions[props.mode]};
     gap: 1.2rem;
   }
+ 
+  
+
+ 
 `;
 
 
 StyledFormRow.defaultProps = {
   
-  mode:"desktop"
+  mode:"desktop",
+  
 }
 
 const Label = styled.label`
@@ -58,7 +66,7 @@ const Error = styled.span`
 const FormRow = ({label,error,children}) => {
   const {mode} = useShowHideSidebar();
   return (
-    <StyledFormRow mode={mode}>
+    <StyledFormRow mode={mode} >
    {label&&<Label htmlFor={children.props.id}>{label}</Label>} 
     {children}
     {error&&<Error> {error}</Error>}

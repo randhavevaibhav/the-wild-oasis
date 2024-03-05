@@ -6,18 +6,20 @@ import AddCabin from "../features/cabins/AddCabin";
 import CabinTableOperations from "../features/cabins/CabinTableOperations";
 import { useShowHideSidebar } from "../context/showHideSideBarContex";
 
- 
 function Cabins() {
-const {mode} = useShowHideSidebar();
+  const { mode } = useShowHideSidebar();
   return (
     <>
-      <Row type={mode==="mobile"?"vertical":"horizontal"} style={{alignItems:mode==="mobile"?"center":"flex-start"}}>
+      <Row
+        type={mode === "mobile" ? "vertical" : "horizontal"}
+        style={{ alignItems: mode === "mobile" ? "center" : "flex-start" }}
+      >
         <Heading as="h1">All cabins</Heading>
-        <CabinTableOperations/>
+        <CabinTableOperations />
       </Row>
       <Row>
+        <AddCabin />
         <CabinTable />
-       <AddCabin/>
       </Row>
     </>
   );

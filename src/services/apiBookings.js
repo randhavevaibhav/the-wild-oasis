@@ -2,6 +2,41 @@ import { getToday } from "../utils/helpers";
 import supabase from "./supabase";
 import { PAGE_SIZE } from "../utils/constants";
 
+
+export async function createEditBooking(newBooking, id)
+{
+  let query = supabase.from("bookings");
+  let errorIn = "Creating new"
+ //A create
+ if (!id) {
+  query = query.insert([{ ...newBooking}]);
+}
+//B edit
+if (id) {
+  query = query
+    .update({ ...newBooking })
+    .eq("id", id)
+    .select();
+    errorIn = "Editing";
+
+}
+
+const { data, error } = await query.select().single();
+
+if (error) {
+  console.log(error);
+ 
+
+  throw new Error(`Error in ${errorIn} cabin`);
+}
+
+return data;
+
+}
+
+
+
+
 export async function getBookings({ filter, sortBy ,page}) {
   let query = supabase
     .from("bookings")

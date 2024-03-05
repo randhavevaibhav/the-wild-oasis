@@ -11,6 +11,7 @@ import {
   HiArrowDownOnSquare,
   HiArrowUpOnSquare,
   HiEye,
+  HiPencil,
   HiTrash,
 } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
@@ -129,6 +130,9 @@ function BookingRow({
                 Check-out
               </Menus.Button>
             )}
+            <Modal.Open opens="edit">
+              <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
+            </Modal.Open>
             <Modal.Open opens="delete">
               <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
             </Modal.Open>
