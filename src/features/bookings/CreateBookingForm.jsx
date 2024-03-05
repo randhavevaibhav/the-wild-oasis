@@ -21,6 +21,8 @@ import DatePickerWrapper from "../../ui/DatePickerItemsWrapper";
 import DatePickerItemsWrapper from "../../ui/DatePickerItemsWrapper";
 import { subtractDates } from "../../utils/helpers";
 import { differenceInDays } from "date-fns";
+import { useCabins } from "../cabins/useCabins";
+import { useGuests } from "./useGuests";
 
 const StyledSelect = styled.select`
   font-size: 1.4rem;
@@ -62,8 +64,10 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
   const { isCreating, createBooking } = useCreateBooking();
 
   const { isEditing, editBooking } = useEditBooking();
+  const {cabins, isLoading:isCabinLoading} =useCabins();
+  const{guests,isLoading:isGuestsLoading} = useGuests();
 
-  const isWorking = isCreating || isEditing;
+  const isWorking = isCreating || isEditing ||isCabinLoading||isGuestsLoading;
   const { mode } = useShowHideSidebar();
 
   const [startDate, setStartDate] = useState(new Date());
@@ -72,14 +76,14 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
   const isEditSession = Boolean(editId);
 
   const [statusValue, setStatusValue] = useState("unconfirmed");
- 
+ const [cabinPrice,setCabinPrice] = useState(0);
   const statusOptions = [
     { value: "unconfirmed", label: "unconfirmed" },
     { value: "checked_in", label: "checked in" },
     { value: "checked_out", label: "checked out" },
   ];
 
-  const { register,setError, handleSubmit, control, reset, getValues, formState } =
+  const { register,setError, handleSubmit, control, reset, getValues,clearErrors, formState } =
     useForm({
       defaultValues: isEditSession ? editValues : {},
     });
@@ -88,41 +92,55 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
 
   const validateDates = ()=>{
     let valdFlag = true;
-    let datediff = differenceInDays(new Date(getValues().todate),new Date(getValues().fromdate));
-    //alert(datediff)
-      if(getValues().fromdate >getValues().todate)
+    let datediff = differenceInDays(new Date(getValues().endDate),new Date(getValues().startDate));
+    //alert(getValues().startDate)
+
+    if(getValues().startDate <new Date())
       {
-        setError("fromdate",  {message: 'from date should be less than to date'});
+        setError("startDate",  {message: 'from date should be greater than todays date'});
         valdFlag=false;
-        return valdFlag;
+        return;
+        
+        
+
+      }
+      if(getValues().startDate >getValues().endDate)
+      {
+        setError("endDate",  {message: 'To date should be greater than From date'});
+        valdFlag=false;
+        return;
+        
         
 
       }
       if(datediff<1||isNaN(datediff))
       {
-        if((getValues().fromdate===undefined&&getValues().todate===undefined) || (datediff===0 &&getValues().fromdate===null&&getValues().todate===null))
+        if((getValues().startDate===undefined&&getValues().endDate===undefined) || (datediff===0 &&(getValues().startDate===null&&getValues().endDate===null)))
         {
-          setError("fromdate",  {message: 'Please select a date'});
-          setError("todate",  {message: 'Please select a date'});
+          setError("startDate",  {message: 'Please select a date'});
+          setError("endDate",  {message: 'Please select a date'});
           valdFlag=false;
-        return valdFlag;
+          return
+       
 
         }
         else{
-          setError("fromdate",  {message: 'stay duration should be greater than or equal to  1 day'});
-        setError("todate",  {message: 'stay duration should be greater than or equal to  1 day'});
+          setError("startDate",  {message: 'stay duration should be greater than or equal to  1 day'});
+        setError("endDate",  {message: 'stay duration should be greater than or equal to  1 day'});
         valdFlag=false;
-        return valdFlag;
+        return;
+        
         }
        
 
       }
       if(datediff>=120)
       {
-        setError("fromdate",  {message: 'stay duration should be less than 4 months'});
-        setError("todate",  {message: 'stay duration should be less than 4 months'});
+        setError("startDate",  {message: 'stay duration should be less than 4 months'});
+        setError("endDate",  {message: 'stay duration should be less than 4 months'});
         valdFlag=false;
-        return valdFlag;
+        return;
+        
 
       }
       return valdFlag;
@@ -130,6 +148,8 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
   }
 
   const onSubmit = (data) => {
+    //alert("hi")
+    //clearErrors();
     if (isEditSession) {
       // editBooking(
       //   { newBookingData: { ...data }, id: editId },
@@ -141,17 +161,35 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
       //   }
       // );
     } else {
-      
-     if(!validateDates()) return;
-
-
+     
+     if(!validateDates()) {
+      //console.log("came out of validateDates fun")
+      return;
+     }
+   
+     
+    //  const filtercabin = cabins.find((cabin)=>cabin.id===62);
+    //  console.log("filtercabin =====> " + JSON.stringify(filtercabin));
       console.log("form data =====> " + JSON.stringify(data));
-      //createBooking({ ...data }, { onSuccess: () => reset() });
+     // createBooking({ ...data }, { onSuccess: () => reset() });
     }
 
     //console.log(data)
   };
-  
+  const handleCabinChange = (e)=>{
+   //console.log("e "+e.target.value);
+      const filterCabin = cabins?.find((cabin)=>cabin.id===parseInt(e.target.value));
+      //console.log("filterCabin =====> " + JSON.stringify(filterCabin));
+      //console.log("filterCabin.regularPrice ====> "+filterCabin.regularPrice);
+      setCabinPrice(()=>
+       filterCabin.regularPrice
+      );
+     //console.log("cabinPrice ====> "+cabinPrice);
+
+   
+   
+
+  }
 
 
 
@@ -161,26 +199,75 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
       type={onCloseModal ? "modal" : "regular"}
       mode={mode}
     >
-      <FormRow label="Booking name" error={errors?.name?.message}>
-        <Input
-          type="text"
-          id="name"
-          {...register("name", {
+     
+      <FormRow label=" Select cabin" error={errors?.cabinId?.message}>
+        <StyledSelect
+          name="cabinId"
+          id="cabinId"
+          disabled={isWorking}
+          {...register("cabinId", {
             required: "This field is reuired",
+          })}
+          onChange={handleCabinChange}
+        >
+          {cabins && cabins.map((cabin)=><option key={cabin.name} value={cabin.id}>{cabin.name}</option>)}
+          
+        </StyledSelect>
+      </FormRow>
+
+      <FormRow label="No. of Nights" error={errors?.numNights?.message}>
+        <Input
+          type="numNights"
+          id="numNights"
+          {...register("numNights", {
+            required: "This field is reuired",
+            min: {
+              value: 1,
+              message: "No. of Nights should be atleast greater than 1",
+            },
           })}
           disabled={isWorking}
         />
       </FormRow>
 
-      <FormRow label="Guest name" error={errors?.guest_name?.message}>
+      <FormRow label="No. of Guests" error={errors?.numGuests?.message}>
         <Input
-          type="text"
-          id="guest_name"
-          {...register("guest_name", {
+          type="numGuests"
+          id="numGuests"
+          {...register("numGuests", {
             required: "This field is reuired",
+            min: {
+              value: 1,
+              message: "No. of Guests should be atleast greater than 1",
+            },
           })}
           disabled={isWorking}
         />
+      </FormRow>
+
+      <FormRow label="Cabin price" error={errors?.cabinPrice?.message}>
+        <Input
+          type="cabinPrice"
+          id="cabinPrice"
+          {...register("cabinPrice")}
+          disabled={true}
+          value={cabinPrice}
+        />
+      </FormRow>
+
+      <FormRow label="Select Guest" error={errors?.guestId?.message}>
+         <StyledSelect
+          name="guestId"
+          id="guestId"
+          disabled={isWorking}
+          {...register("guestId", {
+            required: "This field is reuired",
+          })}
+        >
+          {guests && guests.map((guest)=><option key={guest.name} value={guest.id}>{guest.fullName}</option>)}
+         
+          
+        </StyledSelect>
       </FormRow>
 
       <DatePickerItemsWrapper mode={mode}>
@@ -188,7 +275,7 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
         <StyledDatePickerWrapper mode={mode}>
           <StyledLabel>From :</StyledLabel>
           <Controller
-            name={"fromdate"}
+            name={"startDate"}
             control={control}
             render={({ field: { onChange, onBlur, value, ref } }) => (
               <DatePicker
@@ -200,12 +287,12 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
               />
             )}
           />
-           {errors.fromdate && <p style={{color:"red"}}>{errors.fromdate.message}</p>}
+           {errors.startDate && <p style={{color:"red"}}>{errors.startDate.message}</p>}
         </StyledDatePickerWrapper>
         <StyledDatePickerWrapper mode={mode}>
         <StyledLabel>To :</StyledLabel>
           <Controller
-            name={"todate"}
+            name={"endDate"}
             control={control}
             render={({ field: { onChange, onBlur, value, ref } }) => (
               <DatePicker
@@ -217,7 +304,7 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
               />
             )}
           />
-          {errors.todate && <p style={{color:"red"}}>{errors.todate.message}</p>}
+          {errors.endDate && <p style={{color:"red"}}>{errors.endDate.message}</p>}
         </StyledDatePickerWrapper>
       </DatePickerItemsWrapper>
 
@@ -236,11 +323,11 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
         </StyledSelect>
       </FormRow>
 
-      <FormRow label="ammount" error={errors?.ammount?.message}>
+      <FormRow label="amount" error={errors?.totalPrice?.message}>
         <Input
           type="number"
-          id="ammount"
-          {...register("ammount", {
+          id="totalPrice"
+          {...register("totalPrice", {
             required: "This field is reuired",
             min: {
               value: 1,
