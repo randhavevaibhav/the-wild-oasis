@@ -7,10 +7,13 @@ const displayOptions = {
   desktop:css`grid-template-columns: 24rem 1fr 1.2fr; gap:2.4rem; padding: 1.2rem 0;`
 }
 
-const ButtonDisplayOptions = {
-  mobile:css`justify-content: space-between;`,
-  desktop:css`justify-content: flex-end;`
+const buttonDisplayOptions = {
+  mobile:css`margin-top: 1rem;
+  margin-bottom: 1rem;`,
+  
 }
+
+
 
 const StyledFormRow = styled.div`
   display: grid;
@@ -38,8 +41,10 @@ const StyledFormRow = styled.div`
 
   &:has(button) {
     display: flex;
-    ${props=>ButtonDisplayOptions[props.mode]};
+  
+    justify-content: space-between;
     gap: 1.2rem;
+    ${props=>buttonDisplayOptions[props.mode]};
   }
  
   
