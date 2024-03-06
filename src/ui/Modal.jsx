@@ -22,11 +22,12 @@ const StyledModal = styled.div`
     props.mode==="mobile" &&
     css`
      width: 92%;
-     padding-left:1rem ;
+     /* padding-left:0.2rem ;
 
-    padding-right:1rem;
-    padding-bottom: 0rem;
-    padding-top: 1rem;
+    padding-right:2rem;
+    padding-bottom: 2rem;
+    padding-top: 3rem; */
+    padding: 1rem;
      top: 47%;
     `}
 `;
@@ -93,6 +94,8 @@ function Window({ children, name }) {
   const { openName, close } = useContext(ModalContext);
   const ref = useOutsideClick(close);
   const {mode} = useShowHideSidebar();
+  const modHeight = name==="booking-form"?"80vh":"fit-content";
+  
   
   if (name !== openName) return null;
  
@@ -103,7 +106,7 @@ function Window({ children, name }) {
           <HiXMark />
         </Button>
 
-        <div style={{width:mode==="mobile"?"100%":"",overflow:mode==="mobile"?"scroll":"auto",height:mode==="mobile"?"80vh":"auto"}}>{cloneElement(children, { onCloseModal: close })}</div>
+        <div style={{width:mode==="mobile"?"100%":"",overflow:mode==="mobile"?"scroll":"auto",height:modHeight}}>{cloneElement(children, { onCloseModal: close })}</div>
       </StyledModal>
     </Overlay>,
     document.body
