@@ -93,7 +93,7 @@ function Window({ children, name }) {
   const { openName, close } = useContext(ModalContext);
   const ref = useOutsideClick(close);
   const {mode} = useShowHideSidebar();
-
+  
   if (name !== openName) return null;
  
   return createPortal(
@@ -103,7 +103,7 @@ function Window({ children, name }) {
           <HiXMark />
         </Button>
 
-        <div style={{width:mode==="mobile"?"100%":""}}>{cloneElement(children, { onCloseModal: close })}</div>
+        <div style={{width:mode==="mobile"?"100%":"",overflow:mode==="mobile"?"scroll":"auto",height:mode==="mobile"?"80vh":"auto"}}>{cloneElement(children, { onCloseModal: close })}</div>
       </StyledModal>
     </Overlay>,
     document.body

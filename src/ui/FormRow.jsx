@@ -3,8 +3,8 @@ import { useShowHideSidebar } from "../context/showHideSideBarContex";
 
 
 const displayOptions = {
-  mobile:css`grid-template-columns: 1fr; gap:0rem;`,
-  desktop:css`grid-template-columns: 24rem 1fr 1.2fr; gap:2.4rem;`
+  mobile:css`grid-template-columns: 1fr; gap:0rem; padding: 0.4rem 0;`,
+  desktop:css`grid-template-columns: 24rem 1fr 1.2fr; gap:2.4rem; padding: 1.2rem 0;`
 }
 
 const ButtonDisplayOptions = {
@@ -21,7 +21,7 @@ const StyledFormRow = styled.div`
   
   
 
-  padding: 1.2rem 0;
+  
 
   &:first-child {
     padding-top: 0;

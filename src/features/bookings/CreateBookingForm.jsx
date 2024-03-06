@@ -83,7 +83,7 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
     { value: "checked_out", label: "checked out" },
   ];
 
-  const { register,setError, handleSubmit, control, reset, getValues,clearErrors, formState } =
+  const { register,setError, handleSubmit, control, reset, getValues,setValue,clearErrors, formState } =
     useForm({
       defaultValues: isEditSession ? editValues : {},
     });
@@ -146,6 +146,11 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
       return valdFlag;
      
   }
+  const validateCabinPrice =()=>{
+   // alert(getValues().cabinPrice);
+
+    return true;
+  }
 
   const onSubmit = (data) => {
     //alert("hi")
@@ -166,6 +171,10 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
       //console.log("came out of validateDates fun")
       return;
      }
+     if(!validateCabinPrice())
+     {
+      return;
+     }
    
      
     //  const filtercabin = cabins.find((cabin)=>cabin.id===62);
@@ -178,13 +187,21 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
   };
   const handleCabinChange = (e)=>{
    //console.log("e "+e.target.value);
-      const filterCabin = cabins?.find((cabin)=>cabin.id===parseInt(e.target.value));
-      //console.log("filterCabin =====> " + JSON.stringify(filterCabin));
-      //console.log("filterCabin.regularPrice ====> "+filterCabin.regularPrice);
-      setCabinPrice(()=>
-       filterCabin.regularPrice
-      );
-     //console.log("cabinPrice ====> "+cabinPrice);
+      let selectedCabin  = parseInt(e.target.value);
+      if(isNaN(selectedCabin)) //means "select option"
+      {
+        //setCabinPrice(0);
+        setValue("cabinPrice", 0)
+
+      }else{
+
+        const filterCabin = cabins?.find((cabin)=>cabin.id===parseInt(e.target.value));
+        
+        setValue("cabinPrice", filterCabin.regularPrice)
+        //console.log("cabinPrice ====> "+cabinPrice);
+      }
+     
+     
 
    
    
@@ -207,9 +224,17 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
           disabled={isWorking}
           {...register("cabinId", {
             required: "This field is reuired",
+            validate: (value) =>{
+              if(value==="Select a cabin")
+              {
+                return "Please select a cabin."
+              }
+
+            }
           })}
           onChange={handleCabinChange}
         >
+          <option value="Select a cabin">Select a cabin</option>
           {cabins && cabins.map((cabin)=><option key={cabin.name} value={cabin.id}>{cabin.name}</option>)}
           
         </StyledSelect>
@@ -249,9 +274,17 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
         <Input
           type="cabinPrice"
           id="cabinPrice"
-          {...register("cabinPrice")}
-          disabled={true}
-          value={cabinPrice}
+          value={getValues.cabinPrice}
+          {...register("cabinPrice",{validate: (value) =>{
+              if(value===undefined || value<100)
+              {
+                return "Cabin price should be greater than 100";
+              }
+          },})}
+          disabled={isWorking}
+         
+
+          
         />
       </FormRow>
 
