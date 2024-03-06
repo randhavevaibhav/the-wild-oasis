@@ -23,6 +23,7 @@ import { subtractDates } from "../../utils/helpers";
 import { differenceInDays } from "date-fns";
 import { useCabins } from "../cabins/useCabins";
 import { useGuests } from "./useGuests";
+import { useSettings } from "../settings/useSettings";
 
 const StyledSelect = styled.select`
   font-size: 1.4rem;
@@ -39,14 +40,17 @@ const StyledSelect = styled.select`
 `;
 
 const StyledDatePickerWrapper=styled.div`
-  display: flex;
-  gap: 1rem;
+  display: grid;
+ 
+  grid-template-columns: 24rem 1fr 19rem; 
+  gap:2.4rem;
   align-items: center;
   ${(props) =>
     props.mode === "mobile" &&
     css`
     align-items: flex-start;
-    flex-direction: column;
+    
+    grid-template-columns: 1fr;
 
      
     `}
@@ -66,29 +70,35 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
   const { isEditing, editBooking } = useEditBooking();
   const {cabins, isLoading:isCabinLoading} =useCabins();
   const{guests,isLoading:isGuestsLoading} = useGuests();
+  const {settings,isLoading:isSettingsLoading} = useSettings();
 
-  const isWorking = isCreating || isEditing ||isCabinLoading||isGuestsLoading;
+  
+
+  const isWorking = isCreating || isEditing ||isCabinLoading||isGuestsLoading||isSettingsLoading;
+  
   const { mode } = useShowHideSidebar();
 
-  const [startDate, setStartDate] = useState(new Date());
-
+  
   const { id: editId, ...editValues } = bookingToEdit;
   const isEditSession = Boolean(editId);
 
-  const [statusValue, setStatusValue] = useState("unconfirmed");
- const [cabinPrice,setCabinPrice] = useState(0);
-  const statusOptions = [
-    { value: "unconfirmed", label: "unconfirmed" },
-    { value: "checked_in", label: "checked in" },
-    { value: "checked_out", label: "checked out" },
-  ];
+  let maxBookingNight = 0;
+  let maxGuests = 0;
+  if(!isWorking)
+    {
+      const {maxBookingLength,maxGuestsPerBooking} = settings;
+      maxBookingNight=maxBookingLength;
+      maxGuests=maxGuestsPerBooking;
+    }
+  
+ 
 
   const { register,setError, handleSubmit, control, reset, getValues,setValue,clearErrors, formState } =
     useForm({
       defaultValues: isEditSession ? editValues : {},
     });
 
-  const { errors } = formState;
+  const { errors:formErrors } = formState;
 
   const validateDates = ()=>{
     let valdFlag = true;
@@ -124,7 +134,7 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
        
 
         }
-        else{
+        else if(datediff<=1){
           setError("startDate",  {message: 'stay duration should be greater than or equal to  1 day'});
         setError("endDate",  {message: 'stay duration should be greater than or equal to  1 day'});
         valdFlag=false;
@@ -143,14 +153,29 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
         
 
       }
+
+      if(valdFlag)
+      {
+        clearErrors(["startDate","endDate"]);
+      }
       return valdFlag;
      
   }
-  const validateCabinPrice =()=>{
-   // alert(getValues().cabinPrice);
-
-    return true;
+  const calculateNoOfNights = ()=>{
+    let diffInDays = differenceInDays(new Date(getValues().endDate),new Date(getValues().startDate ));
+    if(!getValues().startDate|| !getValues().endDate || diffInDays<=0)
+    {
+      // alert("no start or end")
+      
+      //setNoOfnights(0);
+      setValue("numNights", 0)
+    }else{
+     
+       //setNoOfnights(diffInDays)
+       setValue("numNights", diffInDays)
+    }
   }
+
 
   const onSubmit = (data) => {
     //alert("hi")
@@ -171,10 +196,7 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
       //console.log("came out of validateDates fun")
       return;
      }
-     if(!validateCabinPrice())
-     {
-      return;
-     }
+     
    
      
     //  const filtercabin = cabins.find((cabin)=>cabin.id===62);
@@ -217,7 +239,7 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
       mode={mode}
     >
      
-      <FormRow label=" Select cabin" error={errors?.cabinId?.message}>
+      <FormRow label=" Select cabin" error={formErrors?.cabinId?.message}>
         <StyledSelect
           name="cabinId"
           id="cabinId"
@@ -240,37 +262,7 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
         </StyledSelect>
       </FormRow>
 
-      <FormRow label="No. of Nights" error={errors?.numNights?.message}>
-        <Input
-          type="numNights"
-          id="numNights"
-          {...register("numNights", {
-            required: "This field is reuired",
-            min: {
-              value: 1,
-              message: "No. of Nights should be atleast greater than 1",
-            },
-          })}
-          disabled={isWorking}
-        />
-      </FormRow>
-
-      <FormRow label="No. of Guests" error={errors?.numGuests?.message}>
-        <Input
-          type="numGuests"
-          id="numGuests"
-          {...register("numGuests", {
-            required: "This field is reuired",
-            min: {
-              value: 1,
-              message: "No. of Guests should be atleast greater than 1",
-            },
-          })}
-          disabled={isWorking}
-        />
-      </FormRow>
-
-      <FormRow label="Cabin price" error={errors?.cabinPrice?.message}>
+      <FormRow label="Cabin price" error={formErrors?.cabinPrice?.message}>
         <Input
           type="cabinPrice"
           id="cabinPrice"
@@ -281,14 +273,99 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
                 return "Cabin price should be greater than 100";
               }
           },})}
-          disabled={isWorking}
+          disabled={true}
          
 
           
         />
       </FormRow>
 
-      <FormRow label="Select Guest" error={errors?.guestId?.message}>
+      <DatePickerItemsWrapper mode={mode}>
+       
+        <StyledDatePickerWrapper mode={mode}>
+          <StyledLabel>From :</StyledLabel>
+          <Controller
+            name={"startDate"}
+            control={control}
+            render={({ field: { onChange, onBlur, value, ref } }) => (
+              <DatePicker
+                toggleCalendarOnIconClick
+                showIcon
+                
+                selected={value}
+                onChange={
+                 onChange
+                }
+               onBlur={()=>{
+               validateDates()
+               calculateNoOfNights()
+               }}
+                placeholderText="Choose a start date"
+              />
+            )}
+          />
+           {formErrors.startDate && <p style={{color:"red"}}>{formErrors.startDate.message}</p>}
+        </StyledDatePickerWrapper>
+        <StyledDatePickerWrapper mode={mode}>
+        <StyledLabel>To :</StyledLabel>
+          <Controller
+            name={"endDate"}
+            control={control}
+            render={({ field: { onChange, onBlur, value, ref } }) => (
+              <DatePicker
+                toggleCalendarOnIconClick
+                showIcon
+                selected={value}
+                onChange={onChange}
+                onBlur={()=>{
+                  validateDates()
+                  calculateNoOfNights()
+                  }}
+                placeholderText="Choose a end date"
+              />
+            )}
+          />
+          {formErrors.endDate && <p style={{color:"red"}}>{formErrors.endDate.message}</p>}
+        </StyledDatePickerWrapper>
+      </DatePickerItemsWrapper>
+
+      <FormRow label="No. of Nights" error={formErrors?.numNights?.message}>
+        <Input
+          type="numNights"
+          id="numNights"
+          value={getValues().numNights}
+          disabled={true}
+          {...register("numNights", {
+            required: "This field is reuired",
+            validate: (value) =>{
+              if(value<maxBookingNight)
+              {
+                return `no of nights should be greater than ${maxBookingNight}`;
+              }
+          }
+          })}
+         
+        />
+      </FormRow>
+
+      <FormRow label="No. of Guests" error={formErrors?.numGuests?.message}>
+        <Input
+          type="numGuests"
+          id="numGuests"
+          {...register("numGuests", {
+            required: "This field is reuired",
+            validate:(value)=>{
+                if(value>maxGuests){
+                  return `max guests per cabin are limited to ${maxGuests}`
+                }
+            }
+          })}
+          disabled={isWorking}
+        />
+      </FormRow>
+ 
+
+      <FormRow label="Select Guest" error={formErrors?.guestId?.message}>
          <StyledSelect
           name="guestId"
           id="guestId"
@@ -303,45 +380,7 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
         </StyledSelect>
       </FormRow>
 
-      <DatePickerItemsWrapper mode={mode}>
-       
-        <StyledDatePickerWrapper mode={mode}>
-          <StyledLabel>From :</StyledLabel>
-          <Controller
-            name={"startDate"}
-            control={control}
-            render={({ field: { onChange, onBlur, value, ref } }) => (
-              <DatePicker
-                toggleCalendarOnIconClick
-                showIcon
-                selected={value}
-                onChange={onChange}
-                placeholderText="Choose a start date"
-              />
-            )}
-          />
-           {errors.startDate && <p style={{color:"red"}}>{errors.startDate.message}</p>}
-        </StyledDatePickerWrapper>
-        <StyledDatePickerWrapper mode={mode}>
-        <StyledLabel>To :</StyledLabel>
-          <Controller
-            name={"endDate"}
-            control={control}
-            render={({ field: { onChange, onBlur, value, ref } }) => (
-              <DatePicker
-                toggleCalendarOnIconClick
-                showIcon
-                selected={value}
-                onChange={onChange}
-                placeholderText="Choose a end date"
-              />
-            )}
-          />
-          {errors.endDate && <p style={{color:"red"}}>{errors.endDate.message}</p>}
-        </StyledDatePickerWrapper>
-      </DatePickerItemsWrapper>
-
-      <FormRow label="status" error={errors?.status?.message}>
+      <FormRow label="status" error={formErrors?.status?.message}>
         <StyledSelect
           name="status"
           id="status"
@@ -356,7 +395,7 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
         </StyledSelect>
       </FormRow>
 
-      <FormRow label="amount" error={errors?.totalPrice?.message}>
+      <FormRow label="amount" error={formErrors?.totalPrice?.message}>
         <Input
           type="number"
           id="totalPrice"

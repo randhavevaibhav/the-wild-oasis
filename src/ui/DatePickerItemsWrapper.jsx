@@ -2,12 +2,12 @@ import styled, { css } from "styled-components";
 
 const displayOptions = {
   mobile:css`flex-direction: column; gap:1rem;`,
-  desktop:css`flex-direction: row;`
+  desktop:css`flex-direction: column; gap:1rem;`
 }
 const StyledDatePickerItems = styled.div`
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  /* justify-content: space-between; */
   
   color: black;
   font-weight: 501;
