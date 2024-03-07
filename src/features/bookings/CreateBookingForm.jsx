@@ -1,30 +1,31 @@
-import { useForm, useController, Controller } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
 import Button from "../../ui/Button";
-import FileInput from "../../ui/FileInput";
-import Textarea from "../../ui/Textarea";
+
 import FormRow from "../../ui/FormRow";
 
 import { useCreateBooking } from "./useCreateBooking";
 import { useShowHideSidebar } from "../../context/showHideSideBarContex";
 import { useEditBooking } from "./useEditBooking";
-import Select from "../../ui/Select";
+
 import { useCallback, useEffect, useState } from "react";
 import styled, { css } from "styled-components";
 import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
-import FormRowVertical from "../../ui/FormRowVertical";
-import DatePickerWrapper from "../../ui/DatePickerItemsWrapper";
 import DatePickerItemsWrapper from "../../ui/DatePickerItemsWrapper";
-import { formatCurrency, subtractDates } from "../../utils/helpers";
-import { differenceInDays } from "date-fns";
+import { formatCurrency } from "../../utils/helpers";
+import { compareAsc, differenceInDays } from "date-fns";
 import { useCabins } from "../cabins/useCabins";
 import { useGuests } from "./useGuests";
 import { useSettings } from "../settings/useSettings";
 import Checkbox from "../../ui/Checkbox";
+import { useGetAllBookings } from "./useGetAllBookings";
+import toast from "react-hot-toast";
+
+
 
 const StyledSelect = styled.select`
   font-size: 1.4rem;
@@ -73,9 +74,12 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
   const { isEditing, editBooking } = useEditBooking();
   const { cabins, isLoading: isCabinLoading } = useCabins();
   const { guests, isLoading: isGuestsLoading } = useGuests();
+  
+  const {bookings,isLoading:isBookingLoading} = useGetAllBookings();
   const { settings, isLoading: isSettingsLoading } = useSettings();
 
   const [addBreakFast, setAddBreakFast] = useState(false);
+  const [filteredBookings,setFilteredBookings] = useState({});
 
   
 
@@ -84,7 +88,8 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
     isEditing ||
     isCabinLoading ||
     isGuestsLoading ||
-    isSettingsLoading;
+    isSettingsLoading ||
+    isBookingLoading;
 
   const { mode } = useShowHideSidebar();
 
@@ -123,6 +128,11 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
    
   }
 
+  const clearBreakFastCheckAndResetTotalAmt = ()=>{
+    setAddBreakFast(false);
+    handleTotalPrice();
+  }
+
 
   const handleTotalPrice = useCallback( ()=>{
     
@@ -158,6 +168,39 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
    
     
   }
+
+const checkIfCabinAvailable = ()=>{
+   console.log("from value ====> "+getValues().startDate);
+let isCabinUnavailale = false;
+  if(getValues().endDate && getValues().startDate)
+  {
+    // console.log("filetered Bookings ===> "+JSON.stringify(filteredBookings))
+    
+    filteredBookings.map((booking,id)=>{
+      //  console.log("booking.endDate ====> "+id+" "+booking.endDate+" comp value ===> "+compareAsc(new Date(getValues().startDate),new Date(booking.endDate)));
+
+     if(compareAsc(new Date(getValues().startDate),new Date(booking.endDate)) ===-1) 
+     {
+      
+
+      isCabinUnavailale=true;
+      setValue("startDate","");
+      setValue("endDate","");
+      toast.error("Please select diffrent dates \nCabin is already booked for those days !!!")
+
+     }
+
+
+    })
+
+    
+  }
+
+  console.log("isCabinUnavailale ====> "+isCabinUnavailale);
+
+}
+
+
 
   const validateDates = () => {
     let valdFlag = true;
@@ -216,6 +259,7 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
     }
 
     if (valdFlag) {
+      checkIfCabinAvailable();
       clearErrors(["startDate", "endDate"]);
     }
     return valdFlag;
@@ -241,7 +285,7 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
       }
       if (diffInDays < maxBookingNight) {
         setError("numNights", {
-          message: `minimum booking nights are greater than ${maxBookingNight}`,
+          message: `minimum booking nights should be greater than ${maxBookingNight}`,
         });
       }
     }
@@ -283,9 +327,20 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
       //setCabinPrice(0);
       setValue("cabinPrice", 0);
     } else {
-      const filterCabin = cabins?.find(
+        const filterCabin = cabins?.find(
         (cabin) => cabin.id === parseInt(e.target.value)
       );
+      
+      const filterBookings = bookings.filter((val)=>{
+        
+          return val.cabinId===filterCabin.id;
+      })
+
+      setFilteredBookings(filterBookings);
+
+      //console.log(filterBookings);
+
+
 
       setValue("cabinPrice", filterCabin.regularPrice);
       handleTotalPrice();
@@ -295,6 +350,7 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
 
  useEffect(()=>{
   handleTotalPrice();
+
  },[handleTotalPrice])
 
   return (
@@ -426,9 +482,13 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
               }
             },
             onBlur:()=>{
-              handleTotalPrice()
+              handleTotalPrice();
+              
 
             },
+            onChange:()=>{
+              clearBreakFastCheckAndResetTotalAmt();
+            }
             
           })}
           disabled={isWorking}
@@ -442,8 +502,17 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
           disabled={isWorking}
           {...register("guestId", {
             required: "This field is reuired",
+            validate:(value)=>{
+              if(value==="Select a guest")
+              {
+                return "Please select a guest"
+
+              }
+              
+            }
           })}
         >
+          <option value="Select a guest">Select a guest</option>
           {guests &&
             guests.map((guest) => (
               <option key={guest.name} value={guest.id}>
@@ -460,8 +529,15 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
           disabled={isWorking}
           {...register("status", {
             required: "This field is reuired",
+            validate:(value)=>{
+              if(value==="Select a guest") 
+              {
+                return "Please select status"
+              }
+            }
           })}
         >
+          <option value="Select a guest">Select status</option>
           <option value="unconfirmed">unconfirmed</option>
           <option value="checked in">checked in</option>
           <option value="checked out">checked out</option>
@@ -522,6 +598,7 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
           {isEditSession ? "Edit booking" : "Add new booking"}
         </Button>
       </FormRow>
+      
     </Form>
   );
 }

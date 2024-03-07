@@ -94,7 +94,7 @@ function Window({ children, name }) {
   const { openName, close } = useContext(ModalContext);
   const ref = useOutsideClick(close);
   const {mode} = useShowHideSidebar();
-  const modHeight = name==="booking-form"?"80vh":"fit-content";
+  const modHeight = name==="booking-form"?"86vh":"fit-content";
   
   
   if (name !== openName) return null;
@@ -106,7 +106,7 @@ function Window({ children, name }) {
           <HiXMark />
         </Button>
 
-        <div style={{width:mode==="mobile"?"100%":"",overflow:mode==="mobile"?"scroll":"auto",height:modHeight}}>{cloneElement(children, { onCloseModal: close })}</div>
+        <div style={{width:mode==="mobile"?"100%":"",overflow:mode==="mobile"?"scroll":"",height:modHeight}}>{cloneElement(children, { onCloseModal: close })}</div>
       </StyledModal>
     </Overlay>,
     document.body

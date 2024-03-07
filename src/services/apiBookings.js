@@ -2,59 +2,61 @@ import { getToday } from "../utils/helpers";
 import supabase from "./supabase";
 import { PAGE_SIZE } from "../utils/constants";
 
-
-export async function createEditBooking(newBooking, id)
-{
+export async function createEditBooking(newBooking, id) {
   let query = supabase.from("bookings");
-  let errorIn = "Creating new"
- //A create
- if (!id) {
-  query = query.insert([{ ...newBooking}]);
-}
-//B edit
-if (id) {
-  query = query
-    .update({ ...newBooking })
-    .eq("id", id)
-    .select();
+  let errorIn = "Creating new";
+  //A create
+  if (!id) {
+    query = query.insert([{ ...newBooking }]);
+  }
+  //B edit
+  if (id) {
+    query = query
+      .update({ ...newBooking })
+      .eq("id", id)
+      .select();
     errorIn = "Editing";
+  }
 
+  const { data, error } = await query.select().single();
+
+  if (error) {
+    console.log(error);
+
+    throw new Error(`Error in ${errorIn} cabin`);
+  }
+
+  return data;
 }
 
-const { data, error } = await query.select().single();
+export async function getAllBookings() {
+  let query = supabase.from("bookings").select("*");
 
-if (error) {
-  console.log(error);
- 
+  const { data, error } = await query;
+  if (error) {
+    console.error(error);
+    throw new Error("Bookings could not be loaded");
+  }
 
-  throw new Error(`Error in ${errorIn} cabin`);
+  return  data;
 }
 
-return data;
-
-}
-
-
-
-
-export async function getBookings({ filter, sortBy ,page}) {
+export async function getBookings({ filter, sortBy, page }) {
   let query = supabase
     .from("bookings")
     .select(
-      "id,created_at,startDate,endDate,numNights,numGuests,status,totalPrice,cabins(name),guests(fullName,email)",{count:"exact"}
+      "id,created_at,startDate,endDate,numNights,numGuests,status,totalPrice,cabinId,cabins(name),guests(fullName,email)",
+      { count: "exact" }
     );
-    //filter
+  //filter
   if (filter) {
     //  console.log("filter.field ===> "+filter.field);
     //  console.log("filter.value ===> "+filter.value);
-   
-     
-      query = query[filter.method || "eq"](filter.field, filter.value);
-    
 
+    query = query[filter.method || "eq"](filter.field, filter.value);
   }
-   //sort
-   if (sortBy) {
+  //sort
+  if (sortBy) {
     // console.log("sortBy.field ===> " + sortBy.field);
     // console.log("sortBy.direction ===> " + sortBy.direction);
     query = query.order(sortBy.field, {
@@ -62,34 +64,29 @@ export async function getBookings({ filter, sortBy ,page}) {
     });
   }
 
- 
-
-  
-
-  if(page)
-  {
-    let from = (page-1)*PAGE_SIZE;
+  if (page) {
+    let from = (page - 1) * PAGE_SIZE;
     //console.log("from ===> "+from)
-   
-    let to =from+PAGE_SIZE -1;
-    
+
+    let to = from + PAGE_SIZE - 1;
 
     //console.log("to ===> "+to)
-    query = query.range(from,to);
+    query = query.range(from, to);
   }
 
-  const { data, error,count } = await query;
+  const { data, error, count } = await query;
   // console.log("data===> "+JSON.stringify(data))
 
- 
- 
+  //  console.log("page ===> "+page)
+  //  console.log("filter ===> "+filter)
+  //  console.log("sortBy ===> "+sortBy)
 
   if (error) {
     console.error(error);
     throw new Error("Bookings could not be loaded");
   }
 
-  return {data,count};
+  return { data, count };
 }
 
 export async function getBooking(id) {
@@ -182,6 +179,19 @@ export async function deleteBooking(id) {
   if (error) {
     console.error(error);
     throw new Error("Booking could not be deleted");
+  }
+  return data;
+}
+
+export async function getBookingsByCabinId(id) {
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("cabinId,endDate")
+    .eq("cabinId", id);
+
+  if (error) {
+    console.error(error);
+    throw new Error("could not get bookings for given cabin");
   }
   return data;
 }

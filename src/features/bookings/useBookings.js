@@ -9,7 +9,7 @@ export const useBookings = () => {
 
   //Filter
   const filterValue = searchParams.get("status");
-  //  console.log("filterValue ===> "+filterValue);
+    
   
   const filter =
     !filterValue || filterValue === "all"
@@ -42,7 +42,7 @@ const page =!searchParams.get("page")?1:Number(searchParams.get("page"));
     error,
   } = useQuery({
     queryKey: ["bookings", filter,sortBy,page],
-    queryFn: () => getBookings({ filter,sortBy,page }),
+    queryFn: () => getBookings({ filter,sortBy,page}),
   });
 
 //PRE-FECHING
