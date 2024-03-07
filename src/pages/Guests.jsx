@@ -2,6 +2,8 @@ import Heading from "../ui/Heading";
 import Row from "../ui/Row";
 
 import { useShowHideSidebar } from "../context/showHideSideBarContex";
+import GuestsTableOperations from "../features/Guests/GuestsTableOperations";
+import GuestTable from "../features/Guests/GuestTable";
 
 
 function Guests() {
@@ -15,10 +17,10 @@ function Guests() {
 
       {/* <AddBooking/> */}
        {/* add AddGuest compo  */}
-      {/* <GuestTableOperations/> */}
+      <GuestsTableOperations/>
       {/* add guests operations  */}
     </Row>
-    {/* <GuestTable/> */}
+    <GuestTable/>
   </>
   
   );

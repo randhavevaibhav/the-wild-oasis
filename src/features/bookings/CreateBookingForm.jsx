@@ -19,7 +19,7 @@ import DatePickerItemsWrapper from "../../ui/DatePickerItemsWrapper";
 import { formatCurrency } from "../../utils/helpers";
 import { compareAsc, differenceInDays } from "date-fns";
 import { useCabins } from "../cabins/useCabins";
-import { useGuests } from "./useGuests";
+import { useGuests } from "../Guests/useGuests";
 import { useSettings } from "../settings/useSettings";
 import Checkbox from "../../ui/Checkbox";
 import { useGetAllBookings } from "./useGetAllBookings";
@@ -123,8 +123,17 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
   const calculateBreakFastPrice = ()=>{
     
     const {breakfastPrice} = settings;
-    optionalBreakfastPrice =
-    breakfastPrice * parseInt(getValues().numNights) * parseInt(getValues().numGuests);
+    
+
+    if(getValues().numNights&&getValues().numGuests)
+    {
+      optionalBreakfastPrice =
+    parseInt(breakfastPrice) * parseInt(getValues().numNights) * parseInt(getValues().numGuests);
+
+    }else{
+      optionalBreakfastPrice=0;
+    }
+    
    
   }
 
@@ -545,7 +554,7 @@ let isCabinUnavailale = false;
       </FormRow>
 
 
-     {getValues().numGuests&&getValues().numNights&&getValues().numGuests >=2&& getValues().numGuests <=maxGuests&&<>
+     {<>
      
       <FormRow>
         <Box>
