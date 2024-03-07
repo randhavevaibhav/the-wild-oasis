@@ -17,7 +17,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePickerItemsWrapper from "../../ui/DatePickerItemsWrapper";
 import { formatCurrency } from "../../utils/helpers";
-import { compareAsc, differenceInDays } from "date-fns";
+import { compareAsc, differenceInDays, format } from "date-fns";
 import { useCabins } from "../cabins/useCabins";
 import { useGuests } from "../Guests/useGuests";
 import { useSettings } from "../settings/useSettings";
@@ -146,7 +146,7 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
   const handleTotalPrice = useCallback( ()=>{
     
     //console.log("addBreakFast === >"+addBreakFast)
-    let totalBookingPrice = 0;
+    let totalBookingPrice = getValues().cabinPrice;
     if(getValues().numNights&&getValues().numGuests)
     {
       if(addBreakFast)
@@ -186,7 +186,7 @@ let isCabinUnavailale = false;
     // console.log("filetered Bookings ===> "+JSON.stringify(filteredBookings))
     
     filteredBookings.map((booking,id)=>{
-      //  console.log("booking.endDate ====> "+id+" "+booking.endDate+" comp value ===> "+compareAsc(new Date(getValues().startDate),new Date(booking.endDate)));
+       console.log("booking.endDate ====> "+id+" "+booking.endDate+" comp value ===> "+compareAsc(new Date(getValues().startDate),new Date(booking.endDate)));
 
      if(compareAsc(new Date(getValues().startDate),new Date(booking.endDate)) ===-1) 
      {
@@ -195,7 +195,9 @@ let isCabinUnavailale = false;
       isCabinUnavailale=true;
       setValue("startDate","");
       setValue("endDate","");
-      toast.error("Please select diffrent dates \nCabin is already booked for those days !!!")
+      toast.error(`Please select from date greater than\n
+      ${format(new Date(booking.endDate), 'dd/MM/yyyy')}
+      \nCabin is already booked for those days !!!`)
 
      }
 
@@ -353,6 +355,18 @@ let isCabinUnavailale = false;
 
       setValue("cabinPrice", filterCabin.regularPrice);
       handleTotalPrice();
+      
+     
+      if(!(toString(selectedCabin)==="Select a cabin"))
+      {
+       
+        clearErrors(["cabinId"]);
+      }
+     
+      if(getValues().cabinPrice>100)
+      {
+        clearErrors(["cabinPrice","totalPrice"]);
+      }
       //console.log("cabinPrice ====> "+cabinPrice);
     }
   };
@@ -368,23 +382,25 @@ let isCabinUnavailale = false;
       type={onCloseModal ? "modal" : "regular"}
       mode={mode}
     >
-      <FormRow label=" Select cabin" error={formErrors?.cabinId?.message}>
+      <FormRow label="Select cabin" error={formErrors?.cabinId?.message}>
         <StyledSelect
           name="cabinId"
           id="cabinId"
+          
           disabled={isWorking}
           {...register("cabinId", {
             required: "This field is reuired",
             validate: (value) => {
-              if (value === "Select a cabin") {
+              if (value === "none") {
                 return "Please select a cabin.";
               }
             },
           })}
           onChange={handleCabinChange}
         >
-          <option value="Select a cabin">Select a cabin</option>
+          <option value="none">Select a cabin</option>
           {cabins &&
+          
             cabins.map((cabin) => (
               <option key={cabin.name} value={cabin.id}>
                 {cabin.name}
@@ -492,6 +508,7 @@ let isCabinUnavailale = false;
             },
             onBlur:()=>{
               handleTotalPrice();
+            
               
 
             },
@@ -556,6 +573,7 @@ let isCabinUnavailale = false;
 
      {<>
      
+      {getValues().numGuests&&getValues().numNights&&getValues().numGuests >=2&& getValues().numGuests <=maxGuests&&
       <FormRow>
         <Box>
           <Checkbox
@@ -572,7 +590,9 @@ let isCabinUnavailale = false;
             Want to add breakfast for {formatCurrency(optionalBreakfastPrice)}?
           </Checkbox>
         </Box>
-      </FormRow>
+      </FormRow>}
+
+
        <FormRow label="Total amount" error={formErrors?.totalPrice?.message}>
        <Input
          type="number"
