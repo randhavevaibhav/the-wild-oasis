@@ -530,14 +530,14 @@ let isCabinUnavailale = false;
           {...register("status", {
             required: "This field is reuired",
             validate:(value)=>{
-              if(value==="Select a guest") 
+              if(value==="Select a status") 
               {
                 return "Please select status"
               }
             }
           })}
         >
-          <option value="Select a guest">Select status</option>
+          <option value="Select a status">Select status</option>
           <option value="unconfirmed">unconfirmed</option>
           <option value="checked in">checked in</option>
           <option value="checked out">checked out</option>

@@ -81,6 +81,13 @@ const MainNav = () => {
         </li>
 
         <li>
+          <StyledNavLink to="/guests" onClick={toggleHide}>
+            <HiOutlineUsers />
+            <span>Guests</span>
+          </StyledNavLink>
+        </li>
+
+        <li>
           <StyledNavLink to="/settings" onClick={toggleHide}>
             <HiOutlineCog6Tooth />
             <span>Settings</span>
