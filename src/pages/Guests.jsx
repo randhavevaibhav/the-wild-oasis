@@ -4,6 +4,7 @@ import Row from "../ui/Row";
 import { useShowHideSidebar } from "../context/showHideSideBarContex";
 import GuestsTableOperations from "../features/Guests/GuestsTableOperations";
 import GuestTable from "../features/Guests/GuestTable";
+import AddGuest from "../features/Guests/AddGuest";
 
 
 function Guests() {
@@ -15,7 +16,7 @@ function Guests() {
     <Row type={type} style={{alignItems:mode==="mobile"?"center":"flex-start"}}>
       <Heading as="h1">All Guests</Heading>
 
-      {/* <AddBooking/> */}
+      <AddGuest/>
        {/* add AddGuest compo  */}
       <GuestsTableOperations/>
       {/* add guests operations  */}

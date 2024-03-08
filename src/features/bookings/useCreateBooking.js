@@ -12,7 +12,7 @@ export const useCreateBooking = () => {
     onSuccess: () => {
       toast.success("New Booking successfully created !!");
       queryClient.invalidateQueries({
-        queryKey: ["create_booking"],
+        queryKey: ["booking"],
       });
     },
     onError: (err) => {

@@ -25,7 +25,7 @@ import Checkbox from "../../ui/Checkbox";
 import { useGetAllBookings } from "./useGetAllBookings";
 import toast from "react-hot-toast";
 import { useGuestsWithNoBooking } from "../Guests/useGuestsWithNoBooking";
-import FormRowVertical from "../../ui/FormRowVertical";
+
 
 
 
@@ -338,7 +338,7 @@ let isCabinUnavailale = false;
   };
 
   const handleCabinChange = (e) => {
-    //console.log("e "+e.target.value);
+    console.log("e "+e.target.value);
     let selectedCabin = parseInt(e.target.value);
     
     if (isNaN(selectedCabin)) {
@@ -589,7 +589,6 @@ let isCabinUnavailale = false;
           <option value="Select a status">Select status</option>
           <option value="unconfirmed">unconfirmed</option>
           <option value="checked in">checked in</option>
-          <option value="checked out">checked out</option>
         </StyledSelect>
       </FormRow>
 

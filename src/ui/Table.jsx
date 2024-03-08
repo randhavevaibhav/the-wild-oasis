@@ -68,7 +68,7 @@ const StyledRow = styled(CommonRow)`
 `;
 
 const displayRowOptions = {
-  mobile:css`gap:2rem;`,
+  mobile:css`gap:2rem; word-wrap:anywhere;`,
   desktop:css`gap:0;`
 }
 

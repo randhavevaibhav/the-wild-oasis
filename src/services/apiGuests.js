@@ -2,6 +2,36 @@
 import { PAGE_SIZE } from "../utils/constants";
 import supabase from "./supabase";
 
+
+export async function createEditGuest(newGuest, id) {
+  let query = supabase.from("guests");
+  let errorIn = "Creating new";
+  //A create
+  if (!id) {
+    query = query.insert([{ ...newGuest }]);
+  }
+  //B edit
+  if (id) {
+    query = query
+      .update({ ...newGuest })
+      .eq("id", id)
+      .select();
+    errorIn = "Editing";
+  }
+
+  const { data, error } = await query.select().single();
+
+  if (error) {
+    console.log(error);
+
+    throw new Error(`Error in ${errorIn} Guest`);
+  }
+
+  return data;
+}
+
+
+
 export async function getGuests() {
   let query = supabase
     .from("guests")
