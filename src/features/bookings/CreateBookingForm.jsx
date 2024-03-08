@@ -26,9 +26,6 @@ import { useGetAllBookings } from "./useGetAllBookings";
 import toast from "react-hot-toast";
 import { useGuestsWithNoBooking } from "../Guests/useGuestsWithNoBooking";
 
-
-
-
 const StyledSelect = styled.select`
   font-size: 1.4rem;
   padding: 0.8rem 1.2rem;
@@ -76,17 +73,17 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
   const { isEditing, editBooking } = useEditBooking();
   const { cabins, isLoading: isCabinLoading } = useCabins();
   //const { guests, isLoading: isGuestsLoading } = useGuests();
-  
-  const {bookings,isLoading:isBookingLoading} = useGetAllBookings();
+
+  const { bookings, isLoading: isBookingLoading } = useGetAllBookings();
   const { settings, isLoading: isSettingsLoading } = useSettings();
-  const {guests:guestsWithNoBooking, isLoading:isGuestsLoading2} = useGuestsWithNoBooking();
+  const { guests: guestsWithNoBooking, isLoading: isGuestsLoading2 } =
+    useGuestsWithNoBooking();
 
   const [addBreakFast, setAddBreakFast] = useState(false);
-  const [filteredBookings,setFilteredBookings] = useState([]);
-const [isCabinSelected,setIsCabinSelected]  =useState(false);
-const [numGuestsState,setnumGuestsState] = useState(0);
-const [isAmountPaid,setIsAmountPaid] = useState(false);
-  
+  const [filteredBookings, setFilteredBookings] = useState([]);
+  const [isCabinSelected, setIsCabinSelected] = useState(false);
+  const [numGuestsState, setnumGuestsState] = useState(0);
+  const [isAmountPaid, setIsAmountPaid] = useState(false);
 
   const isWorking =
     isCreating ||
@@ -94,7 +91,7 @@ const [isAmountPaid,setIsAmountPaid] = useState(false);
     isCabinLoading ||
     // isGuestsLoading ||
     isSettingsLoading ||
-    isBookingLoading||
+    isBookingLoading ||
     isGuestsLoading2;
 
   const { mode } = useShowHideSidebar();
@@ -102,13 +99,10 @@ const [isAmountPaid,setIsAmountPaid] = useState(false);
   const { id: editId, ...editValues } = bookingToEdit;
   const isEditSession = Boolean(editId);
 
-  
-
   let maxBookingNight = 0;
   let maxGuests = 0;
   let optionalBreakfastPrice = 0;
-  
- 
+
   const {
     register,
     setError,
@@ -124,100 +118,75 @@ const [isAmountPaid,setIsAmountPaid] = useState(false);
   });
 
   const { errors: formErrors } = formState;
-  
- 
-  const calculateBreakFastPrice = ()=>{
-    
-    const {breakfastPrice} = settings;
-    
 
-    if(getValues().numNights&&getValues().numGuests)
-    {
+  const calculateBreakFastPrice = () => {
+    const { breakfastPrice } = settings;
+
+    if (getValues().numNights && getValues().numGuests) {
       optionalBreakfastPrice =
-    parseInt(breakfastPrice) * parseInt(getValues().numNights) * parseInt(getValues().numGuests);
-
-    }else{
-      optionalBreakfastPrice=0;
+        parseInt(breakfastPrice) *
+        parseInt(getValues().numNights) *
+        parseInt(getValues().numGuests);
+    } else {
+      optionalBreakfastPrice = 0;
     }
-    
-   
-  }
+  };
 
-  const clearBreakFastCheckAndResetTotalAmt = ()=>{
+  const clearBreakFastCheckAndResetTotalAmt = () => {
     setAddBreakFast(false);
     handleTotalPrice();
-  }
+  };
 
-
-  const handleTotalPrice = useCallback( ()=>{
-    
+  const handleTotalPrice = useCallback(() => {
     //console.log("addBreakFast === >"+addBreakFast)
     let totalBookingPrice = getValues().cabinPrice;
-    if(getValues().numNights&&getValues().numGuests)
-    {
-      if(addBreakFast)
-      {
-        totalBookingPrice = getValues().cabinPrice+optionalBreakfastPrice;
-
-      }
-      else{
+    if (getValues().numNights && getValues().numGuests) {
+      if (addBreakFast) {
+        totalBookingPrice = getValues().cabinPrice + optionalBreakfastPrice;
+      } else {
         totalBookingPrice = getValues().cabinPrice;
       }
-     
     }
-   //alert(totalPrice)
-   setValue("totalPrice",totalBookingPrice)
-
-  }, [addBreakFast,optionalBreakfastPrice,setValue,getValues]);
-  
-  
+    //alert(totalPrice)
+    setValue("totalPrice", totalBookingPrice);
+  }, [addBreakFast, optionalBreakfastPrice, setValue, getValues]);
 
   if (!isWorking) {
-    const { maxBookingLength, maxGuestsPerBooking} = settings;
-    
-    
+    const { maxBookingLength, maxGuestsPerBooking } = settings;
+
     maxBookingNight = maxBookingLength;
     maxGuests = maxGuestsPerBooking;
-    
+
     calculateBreakFastPrice();
-   
-    
   }
 
-const checkIfCabinAvailable = ()=>{
-   //console.log("from value ====> "+getValues().startDate);
-let isCabinUnavailale = false;
-  if(getValues().endDate && getValues().startDate)
-  {
-    // console.log("filetered Bookings ===> "+JSON.stringify(filteredBookings))
-    
-    filteredBookings.map((booking,id)=>{
-       //console.log("booking.endDate ====> "+id+" "+booking.endDate+" comp value ===> "+compareAsc(new Date(getValues().startDate),new Date(booking.endDate)));
+  const checkIfCabinAvailable = () => {
+    //console.log("from value ====> "+getValues().startDate);
+    let isCabinUnavailale = false;
+    if (getValues().endDate && getValues().startDate) {
+      // console.log("filetered Bookings ===> "+JSON.stringify(filteredBookings))
 
-     if(compareAsc(new Date(getValues().startDate),new Date(booking.endDate)) ===-1) 
-     {
-      
+      filteredBookings.map((booking, id) => {
+        //console.log("booking.endDate ====> "+id+" "+booking.endDate+" comp value ===> "+compareAsc(new Date(getValues().startDate),new Date(booking.endDate)));
 
-      isCabinUnavailale=true;
-      setValue("startDate","");
-      setValue("endDate","");
-      toast.error(`Please select from date greater than\n
-      ${format(new Date(booking.endDate), 'dd/MM/yyyy')}
-      \nCabin is already booked for those days !!!`)
+        if (
+          compareAsc(
+            new Date(getValues().startDate),
+            new Date(booking.endDate)
+          ) === -1
+        ) {
+          isCabinUnavailale = true;
+          setValue("startDate", "");
+          setValue("endDate", "");
+          toast.error(`Please select from date greater than\n
+      ${format(new Date(booking.endDate), "dd/MM/yyyy")}
+      \nCabin is already booked for those days !!!`);
+        }
+      });
+    }
 
-     }
-
-
-    })
-
-    
-  }
-
-  console.log("isCabinUnavailale ====> "+isCabinUnavailale);
-
-}
-
-
+    console.log("isCabinUnavailale ====> " + isCabinUnavailale);
+  };
 
   const validateDates = () => {
     let valdFlag = true;
@@ -282,8 +251,6 @@ let isCabinUnavailale = false;
     return valdFlag;
   };
 
-
-
   const calculateNoOfNights = () => {
     let diffInDays = differenceInDays(
       new Date(getValues().endDate),
@@ -329,70 +296,66 @@ let isCabinUnavailale = false;
 
       //  const filtercabin = cabins.find((cabin)=>cabin.id===62);
       //  console.log("filtercabin =====> " + JSON.stringify(filtercabin));
-      data = {...data,"extrasPrice":addBreakFast? optionalBreakfastPrice:0,"hasBreakfast":addBreakFast,"isPaid":isAmountPaid}
+      data = {
+        ...data,
+        extrasPrice: addBreakFast ? optionalBreakfastPrice : 0,
+        hasBreakfast: addBreakFast,
+        isPaid: isAmountPaid,
+        status:"unconfirmed"
+      };
       console.log("form data =====> " + JSON.stringify(data));
-       createBooking({ ...data }, { onSuccess: () => reset() });
+      createBooking({ ...data }, { onSuccess: () => reset() });
     }
 
     //console.log(data)
   };
 
   const handleCabinChange = (e) => {
-    console.log("e "+e.target.value);
+    console.log("e " + e.target.value);
     let selectedCabin = parseInt(e.target.value);
-    
+
     if (isNaN(selectedCabin)) {
       //means "select option"
       //setCabinPrice(0);
-      
-      setValue("startDate","");
-      setValue("endDate","");
+
+      setValue("startDate", "");
+      setValue("endDate", "");
       setValue("cabinPrice", 0);
       setValue("numNights", 0);
       setValue("totalPrice", 0);
       setAddBreakFast(false);
       setIsCabinSelected(false);
-
     } else {
-        const filterCabin = cabins?.find(
+      const filterCabin = cabins?.find(
         (cabin) => cabin.id === parseInt(e.target.value)
       );
-      
-      const filterBookings = bookings.filter((val)=>{
-        
-          return val.cabinId===filterCabin.id;
-      })
+
+      const filterBookings = bookings.filter((val) => {
+        return val.cabinId === filterCabin.id;
+      });
 
       setFilteredBookings(filterBookings);
 
       //console.log(filterBookings);
 
-
-
       setValue("cabinPrice", filterCabin.regularPrice);
       handleTotalPrice();
-      
-     
-      if(!(toString(selectedCabin)==="Select a cabin"))
-      {
-       
+
+      if (!(toString(selectedCabin) === "Select a cabin")) {
         clearErrors(["cabinId"]);
         setIsCabinSelected(true);
       }
-     
-      if(getValues().cabinPrice>100)
-      {
-        clearErrors(["cabinPrice","totalPrice"]);
+
+      if (getValues().cabinPrice > 100) {
+        clearErrors(["cabinPrice", "totalPrice"]);
       }
       //console.log("cabinPrice ====> "+cabinPrice);
     }
   };
 
- useEffect(()=>{
-  handleTotalPrice();
-  
-
- },[handleTotalPrice])
+  useEffect(() => {
+    handleTotalPrice();
+  }, [handleTotalPrice]);
 
   return (
     <Form
@@ -404,7 +367,6 @@ let isCabinUnavailale = false;
         <StyledSelect
           name="cabinId"
           id="cabinId"
-          
           disabled={isWorking}
           {...register("cabinId", {
             required: "This field is reuired",
@@ -418,7 +380,6 @@ let isCabinUnavailale = false;
         >
           <option value="none">Select a cabin</option>
           {cabins &&
-          
             cabins.map((cabin) => (
               <option key={cabin.name} value={cabin.id}>
                 {cabin.name}
@@ -515,30 +476,25 @@ let isCabinUnavailale = false;
         <Input
           type="number"
           id="numGuests"
-         
           {...register("numGuests", {
             required: "This field is reuired",
             validate: (value) => {
               if (value > maxGuests) {
                 return `max guests per cabin are limited to ${maxGuests}`;
               }
-              if (value<2) {
+              if (value < 2) {
                 return `min guests atleast greater than 2`;
               }
             },
-            onBlur:()=>{
+            onBlur: () => {
               handleTotalPrice();
-            
-              
-
             },
-            onChange:(e)=>{
+            onChange: (e) => {
               setnumGuestsState(e.target.value);
               //  alert("hi ==> "+e.target.value)
               clearBreakFastCheckAndResetTotalAmt();
               //calculateBreakFastPrice();
-            }
-            
+            },
           })}
           disabled={isWorking}
         />
@@ -551,14 +507,11 @@ let isCabinUnavailale = false;
           disabled={isWorking}
           {...register("guestId", {
             required: "This field is reuired",
-            validate:(value)=>{
-              if(value==="Select a guest")
-              {
-                return "Please select a guest"
-
+            validate: (value) => {
+              if (value === "Select a guest") {
+                return "Please select a guest";
               }
-              
-            }
+            },
           })}
         >
           <option value="Select a guest">Select a guest</option>
@@ -571,7 +524,7 @@ let isCabinUnavailale = false;
         </StyledSelect>
       </FormRow>
 
-      <FormRow label="status" error={formErrors?.status?.message}>
+      {/* <FormRow label="status" error={formErrors?.status?.message}>
         <StyledSelect
           name="status"
           id="status"
@@ -590,70 +543,61 @@ let isCabinUnavailale = false;
           <option value="unconfirmed">unconfirmed</option>
           <option value="checked in">checked in</option>
         </StyledSelect>
-      </FormRow>
+      </FormRow> */}
 
+      {
+        <>
+          {(numGuestsState &&
+            getValues().numNights &&
+            numGuestsState >= 2 &&
+            numGuestsState <= maxGuests && (
+              <FormRow>
+                <Box>
+                  <Checkbox
+                    checked={addBreakFast}
+                    onChange={() => {
+                      setAddBreakFast((add) => !add);
+                    }}
+                    id="breakfast"
+                  >
+                    Want to add breakfast for{" "}
+                    {formatCurrency(optionalBreakfastPrice)}?
+                  </Checkbox>
+                </Box>
+              </FormRow>
+            )) || <></>}
 
-     {<>
-     
-      {numGuestsState&&getValues().numNights&&numGuestsState >=2&& numGuestsState <=maxGuests&&
-      <FormRow>
-        <Box>
-          <Checkbox
-            checked={addBreakFast}
-            onChange={() => {
-             
-              setAddBreakFast((add) => !add);
-              
-              
-              
-            }}
-            id="breakfast"
-          >
-            Want to add breakfast for {formatCurrency(optionalBreakfastPrice)}?
-          </Checkbox>
-        </Box>
-      </FormRow>||<></>}
+          <FormRow label="Total amount" error={formErrors?.totalPrice?.message}>
+            <Input
+              type="number"
+              id="totalPrice"
+              value={getValues().totalPrice}
+              {...register("totalPrice", {
+                required: "This field is reuired",
+                min: {
+                  value: 1,
+                  message: "ammount should be atleast greater than 1",
+                },
+              })}
+              disabled={true}
+            />
+          </FormRow>
 
-
-       <FormRow label="Total amount" error={formErrors?.totalPrice?.message}>
-       <Input
-         type="number"
-         id="totalPrice"
-         value={getValues().totalPrice}
-         {...register("totalPrice", {
-           required: "This field is reuired",
-           min: {
-             value: 1,
-             message: "ammount should be atleast greater than 1",
-           },
-         })}
-         disabled={true}
-       />
-       
-     </FormRow>
-    
-     <FormRow>
-     <Box>
-          <Checkbox
-            checked={isAmountPaid}
-            onChange={() => {
-             
-              setIsAmountPaid((paid) => !paid);
-              
-              
-              
-            }}
-            id="isAmountPaid"
-          >
-            Is amount Paid?
-          </Checkbox>
-        </Box>
-     </FormRow>
-     </> 
-   
-      
+          <FormRow>
+            <Box>
+              <Checkbox
+                checked={isAmountPaid}
+                onChange={() => {
+                  setIsAmountPaid((paid) => !paid);
+                }}
+                id="isAmountPaid"
+              >
+                Is amount Paid?
+              </Checkbox>
+            </Box>
+          </FormRow>
+        </>
       }
-     
 
       <FormRow>
         {/* type is an HTML attribute! */}
