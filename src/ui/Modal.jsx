@@ -94,7 +94,7 @@ function Window({ children, name }) {
   const { openName, close } = useContext(ModalContext);
   const ref = useOutsideClick(close);
   const {mode} = useShowHideSidebar();
-  const modHeight = name==="booking-form"?"86vh":"fit-content";
+  const modHeight = name==="booking-form"?"92vh":"fit-content";
   
   
   if (name !== openName) return null;

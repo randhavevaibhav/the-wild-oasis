@@ -24,6 +24,8 @@ import { useSettings } from "../settings/useSettings";
 import Checkbox from "../../ui/Checkbox";
 import { useGetAllBookings } from "./useGetAllBookings";
 import toast from "react-hot-toast";
+import { useGuestsWithNoBooking } from "../Guests/useGuestsWithNoBooking";
+import FormRowVertical from "../../ui/FormRowVertical";
 
 
 
@@ -73,30 +75,34 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
 
   const { isEditing, editBooking } = useEditBooking();
   const { cabins, isLoading: isCabinLoading } = useCabins();
-  const { guests, isLoading: isGuestsLoading } = useGuests();
+  //const { guests, isLoading: isGuestsLoading } = useGuests();
   
   const {bookings,isLoading:isBookingLoading} = useGetAllBookings();
   const { settings, isLoading: isSettingsLoading } = useSettings();
+  const {guests:guestsWithNoBooking, isLoading:isGuestsLoading2} = useGuestsWithNoBooking();
 
   const [addBreakFast, setAddBreakFast] = useState(false);
-  const [filteredBookings,setFilteredBookings] = useState({});
-
+  const [filteredBookings,setFilteredBookings] = useState([]);
+const [isCabinSelected,setIsCabinSelected]  =useState(false);
+const [numGuestsState,setnumGuestsState] = useState(0);
+const [isAmountPaid,setIsAmountPaid] = useState(false);
   
 
   const isWorking =
     isCreating ||
     isEditing ||
     isCabinLoading ||
-    isGuestsLoading ||
+    // isGuestsLoading ||
     isSettingsLoading ||
-    isBookingLoading;
+    isBookingLoading||
+    isGuestsLoading2;
 
   const { mode } = useShowHideSidebar();
 
   const { id: editId, ...editValues } = bookingToEdit;
   const isEditSession = Boolean(editId);
 
-  const [totalBookPrice,setTotalBookPrice] = useState(0);
+  
 
   let maxBookingNight = 0;
   let maxGuests = 0;
@@ -179,14 +185,14 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
   }
 
 const checkIfCabinAvailable = ()=>{
-   console.log("from value ====> "+getValues().startDate);
+   //console.log("from value ====> "+getValues().startDate);
 let isCabinUnavailale = false;
   if(getValues().endDate && getValues().startDate)
   {
     // console.log("filetered Bookings ===> "+JSON.stringify(filteredBookings))
     
     filteredBookings.map((booking,id)=>{
-       console.log("booking.endDate ====> "+id+" "+booking.endDate+" comp value ===> "+compareAsc(new Date(getValues().startDate),new Date(booking.endDate)));
+       //console.log("booking.endDate ====> "+id+" "+booking.endDate+" comp value ===> "+compareAsc(new Date(getValues().startDate),new Date(booking.endDate)));
 
      if(compareAsc(new Date(getValues().startDate),new Date(booking.endDate)) ===-1) 
      {
@@ -323,6 +329,7 @@ let isCabinUnavailale = false;
 
       //  const filtercabin = cabins.find((cabin)=>cabin.id===62);
       //  console.log("filtercabin =====> " + JSON.stringify(filtercabin));
+      data = {...data,"extrasPrice":addBreakFast? optionalBreakfastPrice:0,"hasBreakfast":addBreakFast,"isPaid":isAmountPaid}
       console.log("form data =====> " + JSON.stringify(data));
       // createBooking({ ...data }, { onSuccess: () => reset() });
     }
@@ -333,10 +340,19 @@ let isCabinUnavailale = false;
   const handleCabinChange = (e) => {
     //console.log("e "+e.target.value);
     let selectedCabin = parseInt(e.target.value);
+    
     if (isNaN(selectedCabin)) {
       //means "select option"
       //setCabinPrice(0);
+      
+      setValue("startDate","");
+      setValue("endDate","");
       setValue("cabinPrice", 0);
+      setValue("numNights", 0);
+      setValue("totalPrice", 0);
+      setAddBreakFast(false);
+      setIsCabinSelected(false);
+
     } else {
         const filterCabin = cabins?.find(
         (cabin) => cabin.id === parseInt(e.target.value)
@@ -361,6 +377,7 @@ let isCabinUnavailale = false;
       {
        
         clearErrors(["cabinId"]);
+        setIsCabinSelected(true);
       }
      
       if(getValues().cabinPrice>100)
@@ -373,6 +390,7 @@ let isCabinUnavailale = false;
 
  useEffect(()=>{
   handleTotalPrice();
+  
 
  },[handleTotalPrice])
 
@@ -436,6 +454,7 @@ let isCabinUnavailale = false;
                 toggleCalendarOnIconClick
                 showIcon
                 selected={value}
+                disabled={!isCabinSelected}
                 onChange={onChange}
                 onBlur={() => {
                   validateDates();
@@ -459,6 +478,7 @@ let isCabinUnavailale = false;
                 toggleCalendarOnIconClick
                 showIcon
                 selected={value}
+                disabled={!isCabinSelected}
                 onChange={onChange}
                 onBlur={() => {
                   validateDates();
@@ -512,8 +532,11 @@ let isCabinUnavailale = false;
               
 
             },
-            onChange:()=>{
+            onChange:(e)=>{
+              setnumGuestsState(e.target.value);
+              //  alert("hi ==> "+e.target.value)
               clearBreakFastCheckAndResetTotalAmt();
+              //calculateBreakFastPrice();
             }
             
           })}
@@ -539,8 +562,8 @@ let isCabinUnavailale = false;
           })}
         >
           <option value="Select a guest">Select a guest</option>
-          {guests &&
-            guests.map((guest) => (
+          {guestsWithNoBooking &&
+            guestsWithNoBooking.map((guest) => (
               <option key={guest.name} value={guest.id}>
                 {guest.fullName}
               </option>
@@ -573,7 +596,7 @@ let isCabinUnavailale = false;
 
      {<>
      
-      {getValues().numGuests&&getValues().numNights&&getValues().numGuests >=2&& getValues().numGuests <=maxGuests&&
+      {numGuestsState&&getValues().numNights&&numGuestsState >=2&& numGuestsState <=maxGuests&&
       <FormRow>
         <Box>
           <Checkbox
@@ -590,7 +613,7 @@ let isCabinUnavailale = false;
             Want to add breakfast for {formatCurrency(optionalBreakfastPrice)}?
           </Checkbox>
         </Box>
-      </FormRow>}
+      </FormRow>||<></>}
 
 
        <FormRow label="Total amount" error={formErrors?.totalPrice?.message}>
@@ -607,6 +630,25 @@ let isCabinUnavailale = false;
          })}
          disabled={true}
        />
+       
+     </FormRow>
+    
+     <FormRow>
+     <Box>
+          <Checkbox
+            checked={isAmountPaid}
+            onChange={() => {
+             
+              setIsAmountPaid((paid) => !paid);
+              
+              
+              
+            }}
+            id="isAmountPaid"
+          >
+            Is amount Paid?
+          </Checkbox>
+        </Box>
      </FormRow>
      </> 
    
@@ -627,7 +669,7 @@ let isCabinUnavailale = false;
           {isEditSession ? "Edit booking" : "Add new booking"}
         </Button>
       </FormRow>
-      
+      {/* {!isWorking&&console.log("guestsWithNoBooking ===> length \n"+guestsWithNoBooking.length+"\n"+" ---} "+JSON.stringify(guestsWithNoBooking))} */}
     </Form>
   );
 }

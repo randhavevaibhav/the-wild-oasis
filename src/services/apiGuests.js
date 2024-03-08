@@ -70,6 +70,35 @@ export async function getGuestsWithCond({  sortBy, page }) {
 }
 
 
+export async function getGuestsWithNoBooking()
+{
+ let query= supabase
+  .from('guests')
+  .select('fullName,id, bookings (cabinId,guestId)')
+  .is("bookings(guestId)",null)
+  
 
 
+  const { data, error } = await query;
+
+  if (error) {
+    console.error(error);
+    throw new Error("Guests could not be loaded");
+  }
+
+  return data;
+  
+}
+
+
+export async function deleteGuest(id) {
+  // REMEMBER RLS POLICIES
+  const { data, error } = await supabase.from("guests").delete().eq("id", id);
+
+  if (error) {
+    console.error(error);
+    throw new Error("guest could not be deleted");
+  }
+  return data;
+}
 

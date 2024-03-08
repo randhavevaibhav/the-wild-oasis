@@ -20,6 +20,7 @@ import Modal from "../../ui/Modal";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import { useDeleteBooking } from "./useDeleteBooking";
 import { useShowHideSidebar } from "../../context/showHideSideBarContex";
+import { useDeleteGuest } from "../Guests/useDeleteGuest";
 
 const Cabin = styled.div`
   font-size: 1.6rem;
@@ -58,6 +59,7 @@ function BookingRow({
     numGuests,
     totalPrice,
     status,
+    guestId,
     guests: { fullName: guestName, email },
     cabins: { name: cabinName },
   },
@@ -66,6 +68,7 @@ function BookingRow({
   const {mode} = useShowHideSidebar();
   const { checkout, isChekingOut } = useCheckout();
   const { isDeleting, deleteBooking } = useDeleteBooking();
+  const {isDeleting:isGuestDeleting,deleteGuest}=useDeleteGuest();
   const statusToTagName = {
     unconfirmed: "blue",
     "checked-in": "green",
@@ -141,8 +144,13 @@ function BookingRow({
           <Modal.Window name="delete">
             <ConfirmDelete
               resourceName={`Booking which belongs to \n${guestName}`}
-              onConfirm={() => deleteBooking(bookingId)}
-              disabled={isDeleting}
+              onConfirm={() => {
+                deleteBooking(bookingId);
+                deleteGuest(guestId);
+              
+              
+              }}
+              disabled={isDeleting ||isGuestDeleting}
             />
           </Modal.Window>
         </Menus.Menu>
