@@ -331,7 +331,7 @@ let isCabinUnavailale = false;
       //  console.log("filtercabin =====> " + JSON.stringify(filtercabin));
       data = {...data,"extrasPrice":addBreakFast? optionalBreakfastPrice:0,"hasBreakfast":addBreakFast,"isPaid":isAmountPaid}
       console.log("form data =====> " + JSON.stringify(data));
-      // createBooking({ ...data }, { onSuccess: () => reset() });
+       createBooking({ ...data }, { onSuccess: () => reset() });
     }
 
     //console.log(data)
