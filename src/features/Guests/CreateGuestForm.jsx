@@ -12,6 +12,7 @@ import Button from "../../ui/Button";
 import { useState } from "react";
 import { Flag } from "../../ui/Flag";
 import { useCreateGuest } from "./useCreateGuest";
+import Select from "react-select";
 
 
 
@@ -42,6 +43,12 @@ function CreateGuestForm({ guestToEdit = {},onCloseModal }) {
   const { register, handleSubmit, reset, getValues, formState } = useForm({
     defaultValues: isEditSession ? editValues : {},
   });
+
+ 
+  
+
+ 
+
 
   const {isCreating,createGuest} = useCreateGuest()
 
@@ -167,7 +174,7 @@ function CreateGuestForm({ guestToEdit = {},onCloseModal }) {
           {countryData.map((country)=><option key={country.ISOCode} value={country.ISOCode}>{country.countryName}</option>)}
         </StyledSelect>
       </FormRow>
-     {IscountrySelected? <FormRow label="Country Flag" error={errors?.nationalID?.message}>
+     {IscountrySelected? <FormRow label="Country Flag" >
       <Flag src={`https://flagcdn.com/${countryCode}.svg`} alt={`Flag of ${country}`} />
      
         
