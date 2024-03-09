@@ -166,26 +166,34 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
     if (getValues().endDate && getValues().startDate) {
       // console.log("filetered Bookings ===> "+JSON.stringify(filteredBookings))
 
-      filteredBookings.map((booking, id) => {
-        //console.log("booking.endDate ====> "+id+" "+booking.endDate+" comp value ===> "+compareAsc(new Date(getValues().startDate),new Date(booking.endDate)));
+      let sortedBookings = [...filteredBookings].sort((a,b)=>{
+        return new Date (b.endDate) - new Date(a.endDate)
+      });
+      // console.log("sortedBookings Bookings ===> "+JSON.stringify(sortedBookings.map((val)=>val.endDate)))
 
-        if (
+
+     
+           if (
           compareAsc(
             new Date(getValues().startDate),
-            new Date(booking.endDate)
+            new Date(sortedBookings[0]?.endDate)
           ) === -1
         ) {
           isCabinUnavailale = true;
-          setValue("startDate", "");
+          
+        }
+
+      if(isCabinUnavailale)
+      {
+        setValue("startDate", "");
           setValue("endDate", "");
           toast.error(`Please select from date greater than\n
-      ${format(new Date(booking.endDate), "dd/MM/yyyy")}
+      ${format(new Date(sortedBookings[0]?.endDate), "dd/MM/yyyy")}
       \nCabin is already booked for those days !!!`);
-        }
-      });
+      }
     }
 
-    console.log("isCabinUnavailale ====> " + isCabinUnavailale);
+    //console.log("isCabinUnavailale ====> " + isCabinUnavailale);
   };
 
   const validateDates = () => {
@@ -275,6 +283,12 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
     }
   };
 
+  const clearDisableFormInputs =()=>{
+    setValue("numNights", 0);
+    setValue("totalPrice", 0);
+    setIsAmountPaid(false)
+  }
+
   const onSubmit = (data) => {
     //alert("hi")
     //clearErrors();
@@ -304,7 +318,10 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
         status:"unconfirmed"
       };
       console.log("form data =====> " + JSON.stringify(data));
-      createBooking({ ...data }, { onSuccess: () => reset() });
+      createBooking({ ...data }, { onSuccess: () =>{
+        reset();
+        clearDisableFormInputs();
+      }  });
     }
 
     //console.log(data)
@@ -313,13 +330,13 @@ function CreateBookingForm({ bookingToEdit = {}, onCloseModal }) {
   const handleCabinChange = (e) => {
     console.log("e " + e.target.value);
     let selectedCabin = parseInt(e.target.value);
-
+    setValue("startDate", "");
+    setValue("endDate", "");
     if (isNaN(selectedCabin)) {
       //means "select option"
       //setCabinPrice(0);
 
-      setValue("startDate", "");
-      setValue("endDate", "");
+     
       setValue("cabinPrice", 0);
       setValue("numNights", 0);
       setValue("totalPrice", 0);
