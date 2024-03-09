@@ -7,17 +7,28 @@ import Pagination from "../../ui/Pagination";
 import { useShowHideSidebar } from "../../context/showHideSideBarContex";
 import { useGuestsWithCond } from "./useGuestsWithCond";
 import GuestRow from "./GuestRow";
+import { useSearchParams } from "react-router-dom";
+import { useGuestByName } from "./useGuestByName";
 
 function GuestTable() {
   const { guestsWithCond, isLoading, count } = useGuestsWithCond();
   const { mode } = useShowHideSidebar();
-  if (isLoading) return <Spinner />;
+  const [searchParams] = useSearchParams();
+  const searchVal = searchParams.get("searchguest")||"";
+
+  const {isLoading:isLoading2,guestData} = useGuestByName();
+  
+  if (isLoading||isLoading2) return <Spinner />;
+
+
+  console.log("guestData in guest tale"+JSON.stringify(guestData))
+  const {data:guestResult,count:guestResultCount} = guestData;
   // if(!isLoading)
   // {
   //   if(!bookings.length) return <Empty resourceName="bookings"/>
 
   // }
-
+  
   if (!guestsWithCond.length) return <Empty resourceName="Guests" />;
 
   return (
@@ -38,14 +49,21 @@ function GuestTable() {
           </Table.Header>
         )}
 
-        <Table.Body
+     {searchVal===""&&<Table.Body
           data={guestsWithCond}
           render={(guest) => (
             <GuestRow key={guest.id} guest={guest} />
           )}
-        />
+        />}
+
+{searchVal!==""&&<Table.Body
+          data={guestResult||{}}
+          render={(guest) => (
+            <GuestRow key={guest.id} guest={guest} />
+          )}
+        />}
         <Table.Footer>
-          <Pagination count={count} />
+          <Pagination count={searchVal?guestResultCount:count} />
         </Table.Footer>
       </Table>
     </Menus>

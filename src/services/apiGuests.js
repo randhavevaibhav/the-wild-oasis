@@ -132,3 +132,24 @@ export async function deleteGuest(id) {
   return data;
 }
 
+
+export async function getGuestByName(searchVal) {
+  console.log("searchVal in api guest ===> "+searchVal)
+  if(searchVal==="") return [];
+
+  let query= supabase
+  .from('guests')
+  .select('*', { count: "exact" })
+  .ilike("fullName",searchVal+"%")
+
+  const { data, error,count } = await query;
+
+  if (error) {
+    console.error(error);
+    throw new Error(`Could not found guest with name `);
+  }
+
+  return {data,count};
+
+}
+
